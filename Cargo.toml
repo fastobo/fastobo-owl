@@ -3,6 +3,20 @@ name = "fastobo-owl"
 version = "0.1.0"
 authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
 edition = "2018"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/fastobo/fastobo-owl"
+homepage = "https://github.com/fastobo/fastobo-owl"
+description = "OWL language mapping for ontologies in the OBO flat file format 1.4"
+keywords = ["obo", "ontology", "obofoundry", "owl", "semantics"]
+categories = ["science"]
+
+[badges.travis-ci]
+repository = "fastobo/fastobo-owl"
+[badges.is-it-maintained-issue-resolution]
+repository = "fastobo/fastobo-owl"
+[badges.maintenance]
+status     = "actively-developed"
 
 [dependencies]
 fastobo = { git = "https://github.com/althonos/fastobo" }
