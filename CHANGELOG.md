@@ -7,6 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/syntax/v0.2.1...HEAD
+[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/syntax/836b59e...HEAD
 
 Initial release.
