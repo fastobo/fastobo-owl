@@ -1,4 +1,4 @@
--owl# `fastobo-owl` [![Star me](https://img.shields.io/github/stars/fastobo/fastobo-owl.svg?style=social&label=Star&maxAge=3600)](https://github.com/fastobo/fastobo-owl/stargazers)
+# `fastobo-owl` [![Star me](https://img.shields.io/github/stars/fastobo/fastobo-owl.svg?style=social&label=Star&maxAge=3600)](https://github.com/fastobo/fastobo-owl/stargazers)
 
 *OWL language mapping for ontologies in the OBO flat file format 1.4*
 
