@@ -199,10 +199,19 @@ impl IntoOwlCtx for obo::TermClause {
                 )
             ),
 
-
             // IntersectionOf(Option<RelationIdent>, ClassIdent),
             // UnionOf(ClassIdent),
-            // EquivalentTo(ClassIdent),
+
+            obo::TermClause::EquivalentTo(cid) => OwlEntity::from(
+                owl::Axiom::from(
+                    owl::EquivalentClasses(
+                        vec![
+                            owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                            owl::ClassExpression::from(owl::Class(cid.into_owl(ctx))),
+                        ],
+                    )
+                )
+            ),
 
             obo::TermClause::DisjointFrom(cid) => OwlEntity::from(
                 owl::Axiom::from(
