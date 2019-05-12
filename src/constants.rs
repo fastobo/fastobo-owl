@@ -65,6 +65,7 @@ pub mod property {
 
     /// RDF Schema annotation properties.
     pub mod rdfs {
+        pub const LABEL: &'static str = concat!(rdfs!(), "label");
         pub const COMMENT: &'static str = concat!(rdfs!(), "comment");
         pub const SUB_PROPERTY_OF: &'static str = concat!(rdfs!(), "subPropertyOf");
     }
@@ -73,5 +74,11 @@ pub mod property {
     pub mod dc {
         pub const CREATOR: &'static str = concat!(dc!(), "creator");
         pub const DATE: &'static str = concat!(dc!(), "date");
+    }
+
+    /// Information artifact ontology annotation properties.
+    pub mod iao {
+        pub const REPLACED_BY: &'static str = concat!(obo!(), "IAO_0100001");
+        pub const DEFINITION:  &'static str = concat!(obo!(), "IAO_0000115");
     }
 }
