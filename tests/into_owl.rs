@@ -4,27 +4,11 @@ extern crate lazy_static;
 extern crate pretty_assertions;
 
 use std::path::PathBuf;
-use std::str::FromStr;
-use std::fs::read_to_string;
 
 use pretty_assertions::assert_eq;
 
 use fastobo::ast::OboDoc;
 use fastobo_owl::IntoOwl;
-
-
-
-lazy_static::lazy_static! {
-    /// The latest OBO Foundry listing.
-    static ref PREFIXES: curie::PrefixMapping = {
-
-        let mut prefixes = curie::PrefixMapping::default();
-
-
-        prefixes
-
-    };
-}
 
 
 
@@ -52,7 +36,7 @@ macro_rules! converttest {
             // horned_owl::io::writer::write(&mut std::io::stdout(), &actual, Some(&PREFIXES));
 
             // Read the expected OWL
-            let (expected, prefixes) = horned_owl::io::reader::read(
+            let (expected, _prefixes) = horned_owl::io::reader::read(
                 &mut std::io::BufReader::new(
                     std::fs::File::open(&output_path)
                         .expect("could not open output file")
@@ -70,3 +54,4 @@ macro_rules! converttest {
 converttest!(header);
 converttest!(name);
 converttest!(is_a);
+converttest!(equivalent_to);
