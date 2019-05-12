@@ -202,6 +202,7 @@ impl IntoOwlCtx for obo::TermClause {
             // IntersectionOf(Option<RelationIdent>, ClassIdent),
             // UnionOf(ClassIdent),
 
+            // FIXME: should be all grouped into a single axiom ?
             obo::TermClause::EquivalentTo(cid) => OwlEntity::from(
                 owl::Axiom::from(
                     owl::EquivalentClasses(
