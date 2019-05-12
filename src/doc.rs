@@ -8,7 +8,6 @@ use crate::constants::uri;
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
-use super::OwlEntity;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = owl::Ontology;
@@ -60,15 +59,15 @@ impl IntoOwl for obo::OboDoc {
         self.treat_xrefs();
 
         // Create idspace and prefix mapping with default prefixes.
-        let mut prefixes = curie::PrefixMapping::default();
-        prefixes.add_prefix("xsd", uri::XSD).unwrap();
-        prefixes.add_prefix("owl", uri::OWL).unwrap();
-        prefixes.add_prefix("obo", uri::OBO).unwrap();
-        prefixes.add_prefix("oboInOwl", uri::OBO_IN_OWL).unwrap();
-        prefixes.add_prefix("xml", uri::XML).unwrap();
-        prefixes.add_prefix("rdf", uri::RDF).unwrap();
-        prefixes.add_prefix("dc", uri::DC).unwrap();
-        prefixes.add_prefix("rdfs", uri::RDFS).unwrap();
+        // let mut prefixes = curie::PrefixMapping::default();
+        // prefixes.add_prefix("xsd", uri::XSD).unwrap();
+        // prefixes.add_prefix("owl", uri::OWL).unwrap();
+        // prefixes.add_prefix("obo", uri::OBO).unwrap();
+        // prefixes.add_prefix("oboInOwl", uri::OBO_IN_OWL).unwrap();
+        // prefixes.add_prefix("xml", uri::XML).unwrap();
+        // prefixes.add_prefix("rdf", uri::RDF).unwrap();
+        // prefixes.add_prefix("dc", uri::DC).unwrap();
+        // prefixes.add_prefix("rdfs", uri::RDFS).unwrap();
 
         // Create idspace mapping with implicit IDspaces.
         let mut idspaces = HashMap::new();
@@ -84,7 +83,7 @@ impl IntoOwl for obo::OboDoc {
         // Add the prefixes and IDspaces from the OBO header.
         for clause in self.header() {
             if let obo::HeaderClause::Idspace(prefix, url, _) = clause {
-                prefixes.add_prefix(prefix.as_str(), url.as_str()).unwrap();
+                // prefixes.add_prefix(prefix.as_str(), url.as_str()).unwrap();
                 idspaces.insert(prefix.clone(), url.clone());
             }
         }
@@ -93,12 +92,13 @@ impl IntoOwl for obo::OboDoc {
         let build: horned_owl::model::Build = Default::default();
         let ontology_iri = obo::Url::parse(uri::OBO).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.clone().into_string());
+        let class_level = Default::default(); // FIXME
         let mut ctx = Context {
             build,
-            prefixes,
             idspaces,
             ontology_iri,
             current_frame,
+            class_level,
         };
 
         // Return the converted document.

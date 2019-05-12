@@ -3,12 +3,10 @@
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
-use crate::constants::datatype::xsd;
-use crate::constants::property::obo_in_owl;
-use crate::constants::property::rdfs;
+use crate::constants::datatype;
+use crate::constants::property;
 use super::Context;
 use super::IntoOwlCtx;
-
 
 impl IntoOwlCtx for obo::HeaderClause {
     type Owl = Option<owl::AnnotatedAxiom>;
@@ -19,10 +17,10 @@ impl IntoOwlCtx for obo::HeaderClause {
                 owl::OntologyAnnotation(
                     owl::Annotation {
                         annotation_property: ctx.build.annotation_property(
-                            obo_in_owl::HAS_OBO_FORMAT_VERSION
+                            property::obo_in_owl::HAS_OBO_FORMAT_VERSION
                         ),
                         annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(v.into_string()),
                             lang: None,
                         })
@@ -39,9 +37,9 @@ impl IntoOwlCtx for obo::HeaderClause {
             obo::HeaderClause::Date(dt) => Some(owl::AnnotatedAxiom::from(
                 owl::OntologyAnnotation(
                     owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(obo_in_owl::HAS_DATE),
+                        annotation_property: ctx.build.annotation_property(property::obo_in_owl::HAS_DATE),
                         annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::DATETIME)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::DATETIME)),
                             lang: None,
                             literal: Some(obo::DateTime::to_xsd_datetime(&dt)),
                         })
@@ -53,9 +51,9 @@ impl IntoOwlCtx for obo::HeaderClause {
             obo::HeaderClause::SavedBy(n) => Some(owl::AnnotatedAxiom::from(
                 owl::OntologyAnnotation(
                     owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(obo_in_owl::SAVED_BY),
+                        annotation_property: ctx.build.annotation_property(property::obo_in_owl::SAVED_BY),
                         annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(n.into_string()),
                             lang: None,
                         })
@@ -69,10 +67,10 @@ impl IntoOwlCtx for obo::HeaderClause {
                 owl::OntologyAnnotation(
                     owl::Annotation {
                         annotation_property: ctx.build.annotation_property(
-                            obo_in_owl::AUTO_GENERATED_BY
+                            property::obo_in_owl::AUTO_GENERATED_BY
                         ),
                         annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(n.into_string()),
                             lang: None,
                         })
@@ -96,16 +94,17 @@ impl IntoOwlCtx for obo::HeaderClause {
             //         <rdfs:comment rdf:datatype="xsd:string">T(description)</rdfs:comment>
             //         <rdfs:subPropertyOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#SubsetProperty"/>
             //     </owl:AnnotationProperty>
+            // FIXME: Add description
             obo::HeaderClause::Subsetdef(subset, description) => Some(
                 owl::AnnotatedAxiom::from(
                     owl::AnnotationAssertion {
                         annotation_subject: obo::Ident::from(subset).into_owl(ctx),
                         annotation: owl::Annotation {
                             annotation_property: ctx.build.annotation_property(
-                                rdfs::SUB_PROPERTY_OF
+                                property::rdfs::SUB_PROPERTY_OF
                             ),
                             annotation_value: owl::AnnotationValue::IRI(
-                                ctx.build.iri(obo_in_owl::SUBSET_PROPERTY)
+                                ctx.build.iri(property::obo_in_owl::SUBSET_PROPERTY)
                             )
                         }
                     }
@@ -118,16 +117,17 @@ impl IntoOwlCtx for obo::HeaderClause {
             //          <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Systematic synonym</rdfs:label>
             //          <rdfs:subPropertyOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty"/>
             //      </owl:AnnotationProperty>
+            // FIXME: Add description and scope
             obo::HeaderClause::SynonymTypedef(ty, desc, scope) => Some(
                 owl::AnnotatedAxiom::from(
                     owl::AnnotationAssertion {
                         annotation_subject: obo::Ident::from(ty).into_owl(ctx),
                         annotation: owl::Annotation {
                             annotation_property: ctx.build.annotation_property(
-                                rdfs::SUB_PROPERTY_OF
+                                property::rdfs::SUB_PROPERTY_OF
                             ),
                             annotation_value: owl::AnnotationValue::IRI(
-                                ctx.build.iri(obo_in_owl::SYNONYM_TYPE_PROPERTY),
+                                ctx.build.iri(property::obo_in_owl::SYNONYM_TYPE_PROPERTY),
                             )
                         }
                     }
@@ -140,10 +140,10 @@ impl IntoOwlCtx for obo::HeaderClause {
                     owl::OntologyAnnotation(
                         owl::Annotation {
                             annotation_property: ctx.build.annotation_property(
-                                obo_in_owl::HAS_DEFAULT_NAMESPACE
+                                property::obo_in_owl::HAS_DEFAULT_NAMESPACE
                             ),
                             annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                                datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                                datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                                 literal: Some(ns.to_string()),
                                 lang: None,
                             })
@@ -157,10 +157,10 @@ impl IntoOwlCtx for obo::HeaderClause {
                     owl::OntologyAnnotation(
                         owl::Annotation {
                             annotation_property: ctx.build.annotation_property(
-                                obo_in_owl::NAMESPACE_ID_RULE
+                                property::obo_in_owl::NAMESPACE_ID_RULE
                             ),
                             annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                                datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                                datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                                 literal: Some(r.into_string()),
                                 lang: None,
                             })
@@ -186,9 +186,9 @@ impl IntoOwlCtx for obo::HeaderClause {
             obo::HeaderClause::Remark(v) => Some(owl::AnnotatedAxiom::from(
                 owl::OntologyAnnotation(
                     owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(rdfs::COMMENT),
+                        annotation_property: ctx.build.annotation_property(property::rdfs::COMMENT),
                         annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(v.into_string()),
                             lang: None,
                         })

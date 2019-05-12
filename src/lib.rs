@@ -11,12 +11,10 @@ mod term;
 mod pv;
 
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
-
-
-
 
 /// The internal trait for data conversion;
 ///
@@ -36,11 +34,23 @@ pub trait IntoOwl {
 
 /// An opaque structure to pass context arguments required for OWL conversion.
 struct Context {
+
+    ///
     build: owl::Build,
-    prefixes: curie::PrefixMapping,
+
+    // prefixes: curie::PrefixMapping,
+
     idspaces: HashMap<obo::IdentPrefix, obo::Url>,
+
     ontology_iri: obo::Url,
+
     current_frame: owl::IRI,
+
+    /// A set of IRI which refer to class level annotation relationships.
+    ///
+    /// This is likely to require processing imports beforehand.
+    class_level: HashSet<owl::IRI>,
+
 }
 
 /// An entity produced by a certain clause.

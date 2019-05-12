@@ -54,13 +54,21 @@ pub mod property {
         pub const CONSIDER: &'static str = concat!(oboInOwl!(), "consider");
         pub const HAS_DATE: &'static str = concat!(oboInOwl!(), "hasDate");
         pub const HAS_DBXREF: &'static str = concat!(oboInOwl!(), "hasDbXref");
+        pub const HAS_ALTERNATIVE_ID: &'static str = concat!(oboInOwl!(), "hasAlternativeId");
         pub const HAS_DEFAULT_NAMESPACE: &'static str = concat!(oboInOwl!(), "hasDefaultNamespace");
         pub const HAS_OBO_FORMAT_VERSION: &'static str = concat!(oboInOwl!(), "hasOBOFormatVersion");
+        pub const HAS_OBO_NAMESPACE: &'static str = concat!(oboInOwl!(), "hasOBONamespace");
         pub const ID: &'static str = concat!(oboInOwl!(), "id");
+        pub const IN_SUBSET: &'static str = concat!(oboInOwl!(), "inSubset");
         pub const NAMESPACE_ID_RULE: &'static str = concat!(oboInOwl!(), "NamespaceIdRule");
         pub const SAVED_BY: &'static str = concat!(oboInOwl!(), "savedBy");
         pub const SUBSET_PROPERTY: &'static str = concat!(oboInOwl!(), "SubsetProperty");
         pub const SYNONYM_TYPE_PROPERTY: &'static str = concat!(oboInOwl!(), "SynonymTypeProperty");
+    }
+
+    /// OWL2 annotation properties.
+    pub mod owl {
+        pub const DEPRECATED: &'static str = concat!(owl!(), "deprecated");
     }
 
     /// RDF Schema annotation properties.

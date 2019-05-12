@@ -4,11 +4,8 @@ use std::iter::FromIterator;
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
-use crate::constants::datatype::xsd;
-use crate::constants::property::rdfs;
-use crate::constants::property::dc;
-use crate::constants::property::iao;
-use crate::constants::property::obo_in_owl;
+use crate::constants::datatype;
+use crate::constants::property;
 use super::Context;
 use super::IntoOwlCtx;
 use super::OwlEntity;
@@ -39,10 +36,10 @@ impl IntoOwlCtx for obo::TermFrame {
                     annotation_subject: id.clone(),
                     annotation: owl::Annotation {
                         annotation_property: ctx.build.annotation_property(
-                            obo_in_owl::ID
+                            property::obo_in_owl::ID
                         ),
                         annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(self.id_mut().as_ref().to_string()),
                             lang: None,
                         })
@@ -81,10 +78,10 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::Name(name) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("rdfs:label").unwrap()
+                        property::rdfs::LABEL,
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                         literal: Some(name.into_string()),
                         lang: None,
                     })
@@ -93,12 +90,10 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::Namespace(ns) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("oboInOwl:hasOBONamespace").unwrap()
+                        property::obo_in_owl::HAS_OBO_NAMESPACE,
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(
-                            ctx.prefixes.expand_curie_string("xsd:string").unwrap()
-                        )),
+                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                         literal: Some(ns.to_string()),
                         lang: None,
                     })
@@ -107,12 +102,10 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::AltId(id) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("oboInOwl:hasAlternativeId").unwrap()
+                        property::obo_in_owl::HAS_ALTERNATIVE_ID
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(
-                            ctx.prefixes.expand_curie_string("xsd:string").unwrap()
-                        )),
+                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                         literal: Some(id.to_string()),
                         lang: None,
                     })
@@ -123,10 +116,10 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::Def(desc, xrefs) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        iao::DEFINITION
+                        property::iao::DEFINITION
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                         literal: Some(desc.into_string()),
                         lang: None,
                     })
@@ -136,10 +129,10 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::Comment(comment) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("rdfs:comment").unwrap()
+                        property::rdfs::COMMENT
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                         literal: Some(comment.into_string()),
                         lang: None,
                     })
@@ -148,7 +141,7 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::Subset(subset) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("oboInOwl:inSubset").unwrap()
+                        property::obo_in_owl::IN_SUBSET
                     ),
                     annotation_value: owl::AnnotationValue::IRI(
                         obo::Ident::from(subset).into_owl(ctx),
@@ -163,10 +156,10 @@ impl IntoOwlCtx for obo::TermClause {
                             annotation_subject: ctx.current_frame.clone(),
                             annotation: owl::Annotation {
                                 annotation_property: ctx.build.annotation_property(
-                                    obo_in_owl::HAS_DBXREF
+                                    property::obo_in_owl::HAS_DBXREF
                                 ),
                                 annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                                    datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                                    datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                                     literal: Some(xref.id().to_string()),
                                     lang: None,
                                 }),
@@ -175,9 +168,9 @@ impl IntoOwlCtx for obo::TermClause {
                     ),
                     BTreeSet::from_iter(
                         xref.description().map(|desc| owl::Annotation {
-                            annotation_property: ctx.build.annotation_property(rdfs::LABEL),
+                            annotation_property: ctx.build.annotation_property(property::rdfs::LABEL),
                             annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                                datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                                datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                                 literal: Some(desc.clone().into_string()),
                                 lang: None,
                             })
@@ -240,10 +233,10 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::IsObsolete(b) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("owl:deprecated").unwrap()
+                        property::owl::DEPRECATED
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(xsd::BOOLEAN)),
+                        datatype_iri: Some(ctx.build.iri(datatype::xsd::BOOLEAN)),
                         literal: Some(b.to_string()),
                         lang: None,
                     })
@@ -253,7 +246,7 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::ReplacedBy(id) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        iao::REPLACED_BY
+                        property::iao::REPLACED_BY
                     ),
                     annotation_value: owl::AnnotationValue::IRI(
                         id.into_owl(ctx),
@@ -264,7 +257,7 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::Consider(id) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        obo_in_owl::CONSIDER
+                        property::obo_in_owl::CONSIDER
                     ),
                     annotation_value: owl::AnnotationValue::IRI(
                         obo::Ident::from(id).into_owl(ctx),
@@ -275,11 +268,11 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::CreatedBy(c) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        dc::CREATOR
+                        property::dc::CREATOR
                     ),
                     annotation_value: owl::AnnotationValue::Literal(
                         owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(c.into_string()),
                             lang: None,
                         }
@@ -290,11 +283,11 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::CreationDate(dt) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        dc::DATE
+                        property::dc::DATE
                     ),
                     annotation_value: owl::AnnotationValue::Literal(
                         owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(xsd::DATETIME)),
+                            datatype_iri: Some(ctx.build.iri(datatype::xsd::DATETIME)),
                             lang: None,
                             literal: Some(obo::DateTime::to_xsd_datetime(&dt)),
                         }
