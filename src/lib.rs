@@ -48,7 +48,7 @@ struct Context {
 /// into axioms, and some have no translation.
 enum OwlEntity {
     Annotation(owl::Annotation),
-    Axiom(owl::Axiom),
+    Axiom(owl::AnnotatedAxiom),
     None
 }
 
@@ -60,6 +60,12 @@ impl From<owl::Annotation> for OwlEntity {
 
 impl From<owl::Axiom> for OwlEntity {
     fn from(a: owl::Axiom) -> Self {
+        OwlEntity::Axiom(owl::AnnotatedAxiom::from(a))
+    }
+}
+
+impl From<owl::AnnotatedAxiom> for OwlEntity {
+    fn from(a: owl::AnnotatedAxiom) -> Self {
         OwlEntity::Axiom(a)
     }
 }
