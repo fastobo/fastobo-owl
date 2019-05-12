@@ -1,14 +1,18 @@
 use std::collections::BTreeSet;
+use std::iter::FromIterator;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
 use crate::constants::datatype::xsd;
+use crate::constants::property::rdfs;
 use crate::constants::property::dc;
+use crate::constants::property::iao;
 use crate::constants::property::obo_in_owl;
 use super::Context;
 use super::IntoOwlCtx;
 use super::OwlEntity;
+
 
 impl IntoOwlCtx for obo::TermFrame {
     type Owl = BTreeSet<owl::AnnotatedAxiom>;
@@ -45,6 +49,10 @@ impl IntoOwlCtx for obo::TermFrame {
             )
         );
 
+        // Group assertion clauses together:
+        // - IntersectionOf(Option<RelationIdent>, ClassIdent),
+        // - UnionOf(ClassIdent),
+
         // Convert remaining clauses to axioms.
         for line in self.into_iter() {
             match line.into_inner().into_owl(ctx) {
@@ -67,7 +75,7 @@ impl IntoOwlCtx for obo::TermClause {
         match self {
 
             // IsAnonymous(bool),
-            obo::TermClause::Name(name) => OwlEntity::Annotation(
+            obo::TermClause::Name(name) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         ctx.prefixes.expand_curie_string("rdfs:label").unwrap()
@@ -79,7 +87,7 @@ impl IntoOwlCtx for obo::TermClause {
                     })
                 }
             ),
-            obo::TermClause::Namespace(ns) => OwlEntity::Annotation(
+            obo::TermClause::Namespace(ns) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         ctx.prefixes.expand_curie_string("oboInOwl:hasOBONamespace").unwrap()
@@ -93,7 +101,7 @@ impl IntoOwlCtx for obo::TermClause {
                     })
                 }
             ),
-            obo::TermClause::AltId(id) => OwlEntity::Annotation(
+            obo::TermClause::AltId(id) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         ctx.prefixes.expand_curie_string("oboInOwl:hasAlternativeId").unwrap()
@@ -109,10 +117,10 @@ impl IntoOwlCtx for obo::TermClause {
             ),
 
             // FIXME: add xrefs to translated axiom.
-            obo::TermClause::Def(desc, xrefs) => OwlEntity::Annotation(
+            obo::TermClause::Def(desc, xrefs) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
-                        ctx.prefixes.expand_curie_string("obo:IAO_0000115").unwrap()
+                        iao::DEFINITION
                     ),
                     annotation_value: owl::AnnotationValue::Literal(owl::Literal {
                         datatype_iri: Some(ctx.build.iri(xsd::STRING)),
@@ -121,7 +129,8 @@ impl IntoOwlCtx for obo::TermClause {
                     })
                 }
             ),
-            obo::TermClause::Comment(comment) => OwlEntity::Annotation(
+
+            obo::TermClause::Comment(comment) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         ctx.prefixes.expand_curie_string("rdfs:comment").unwrap()
@@ -133,7 +142,7 @@ impl IntoOwlCtx for obo::TermClause {
                     })
                 }
             ),
-            obo::TermClause::Subset(subset) => OwlEntity::Annotation(
+            obo::TermClause::Subset(subset) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         ctx.prefixes.expand_curie_string("oboInOwl:inSubset").unwrap()
@@ -144,29 +153,40 @@ impl IntoOwlCtx for obo::TermClause {
                 }
             ),
 
-            // FIXME: add xref description to translated axiom.
-            obo::TermClause::Xref(xref) => OwlEntity::Axiom(
-                owl::Axiom::from(
-                    owl::AnnotationAssertion{
-                        annotation_subject: ctx.current_frame.clone(),
-                        annotation: owl::Annotation {
-                            annotation_property: ctx.build.annotation_property(
-                                obo_in_owl::HAS_DBXREF
-                            ),
+            obo::TermClause::Xref(xref) => OwlEntity::from(
+                owl::AnnotatedAxiom::new(
+                    owl::Axiom::from(
+                        owl::AnnotationAssertion{
+                            annotation_subject: ctx.current_frame.clone(),
+                            annotation: owl::Annotation {
+                                annotation_property: ctx.build.annotation_property(
+                                    obo_in_owl::HAS_DBXREF
+                                ),
+                                annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+                                    datatype_iri: Some(ctx.build.iri(xsd::STRING)),
+                                    literal: Some(xref.id().to_string()),
+                                    lang: None,
+                                }),
+                            }
+                        }
+                    ),
+                    BTreeSet::from_iter(
+                        xref.description().map(|desc| owl::Annotation {
+                            annotation_property: ctx.build.annotation_property(rdfs::LABEL),
                             annotation_value: owl::AnnotationValue::Literal(owl::Literal {
                                 datatype_iri: Some(ctx.build.iri(xsd::STRING)),
-                                literal: Some(xref.id().to_string()),
+                                literal: Some(desc.clone().into_string()),
                                 lang: None,
-                            }),
-                        }
-                    }
+                            })
+                        })
+                    ),
                 )
             ),
 
             // Builtin(bool),
-            // PropertyValue(PropertyValue),
+            // PropertyValue(pv)
 
-            obo::TermClause::IsA(supercls) => OwlEntity::Axiom(
+            obo::TermClause::IsA(supercls) => OwlEntity::from(
                 owl::Axiom::from(
                     owl::SubClassOf {
                         super_class: owl::ClassExpression::Class(
@@ -183,9 +203,20 @@ impl IntoOwlCtx for obo::TermClause {
             // IntersectionOf(Option<RelationIdent>, ClassIdent),
             // UnionOf(ClassIdent),
             // EquivalentTo(ClassIdent),
-            // DisjointFrom(ClassIdent),
+
+            obo::TermClause::DisjointFrom(cid) => OwlEntity::from(
+                owl::Axiom::from(
+                    owl::DisjointClasses(
+                        vec![
+                            owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                            owl::ClassExpression::from(owl::Class(cid.into_owl(ctx))),
+                        ],
+                    )
+                )
+            ),
+
             // Relationship(RelationIdent, ClassIdent),
-            obo::TermClause::IsObsolete(b) => OwlEntity::Annotation(
+            obo::TermClause::IsObsolete(b) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         ctx.prefixes.expand_curie_string("owl:deprecated").unwrap()
@@ -198,9 +229,18 @@ impl IntoOwlCtx for obo::TermClause {
                 }
             ),
 
-            // ReplacedBy(ClassIdent),
+            obo::TermClause::ReplacedBy(id) => OwlEntity::from(
+                owl::Annotation {
+                    annotation_property: ctx.build.annotation_property(
+                        iao::REPLACED_BY
+                    ),
+                    annotation_value: owl::AnnotationValue::IRI(
+                        id.into_owl(ctx),
+                    )
+                }
+            ),
 
-            obo::TermClause::Consider(id) => OwlEntity::Annotation(
+            obo::TermClause::Consider(id) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         obo_in_owl::CONSIDER
@@ -211,7 +251,7 @@ impl IntoOwlCtx for obo::TermClause {
                 }
             ),
 
-            obo::TermClause::CreatedBy(c) => OwlEntity::Annotation(
+            obo::TermClause::CreatedBy(c) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         dc::CREATOR
@@ -226,7 +266,7 @@ impl IntoOwlCtx for obo::TermClause {
                 }
             ),
 
-            obo::TermClause::CreationDate(dt) => OwlEntity::Annotation(
+            obo::TermClause::CreationDate(dt) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
                         dc::DATE
