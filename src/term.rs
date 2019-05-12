@@ -31,6 +31,8 @@ impl IntoOwlCtx for obo::TermFrame {
         });
 
         // Add the original OBO ID as an annotation.
+        // FIXME: maybe only do that if the term is not declared as being
+        //        anonymous ?
         axioms.insert(
             owl::AnnotatedAxiom::from(
                 owl::AnnotationAssertion {
@@ -75,6 +77,7 @@ impl IntoOwlCtx for obo::TermClause {
         match self {
 
             // IsAnonymous(bool),
+
             obo::TermClause::Name(name) => OwlEntity::from(
                 owl::Annotation {
                     annotation_property: ctx.build.annotation_property(
@@ -183,8 +186,16 @@ impl IntoOwlCtx for obo::TermClause {
                 )
             ),
 
-            // Builtin(bool),
-            // PropertyValue(pv)
+            obo::TermClause::Builtin(_) => OwlEntity::None,
+
+            obo::TermClause::PropertyValue(pv) => OwlEntity::from(
+                owl::Axiom::from(
+                    owl::AnnotationAssertion{
+                        annotation_subject: ctx.current_frame.clone(),
+                        annotation: pv.into_owl(ctx),
+                    }
+                )
+            ),
 
             obo::TermClause::IsA(supercls) => OwlEntity::from(
                 owl::Axiom::from(
