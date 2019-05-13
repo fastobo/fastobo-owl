@@ -1,4 +1,5 @@
-
+use std::collections::BTreeSet;
+use std::iter::FromIterator;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
@@ -94,9 +95,8 @@ impl IntoOwlCtx for obo::HeaderClause {
             //         <rdfs:comment rdf:datatype="xsd:string">T(description)</rdfs:comment>
             //         <rdfs:subPropertyOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#SubsetProperty"/>
             //     </owl:AnnotationProperty>
-            // FIXME: Add description
-            obo::HeaderClause::Subsetdef(subset, description) => Some(
-                owl::AnnotatedAxiom::from(
+            obo::HeaderClause::Subsetdef(subset, desc) => Some(
+                owl::AnnotatedAxiom::new(
                     owl::AnnotationAssertion {
                         annotation_subject: obo::Ident::from(subset).into_owl(ctx),
                         annotation: owl::Annotation {
@@ -107,7 +107,21 @@ impl IntoOwlCtx for obo::HeaderClause {
                                 ctx.build.iri(property::obo_in_owl::SUBSET_PROPERTY)
                             )
                         }
-                    }
+                    },
+                    BTreeSet::from_iter(Some(
+                        owl::Annotation {
+                            annotation_property: ctx.build.annotation_property(
+                                property::rdfs::COMMENT
+                            ),
+                            annotation_value: owl::AnnotationValue::Literal(
+                                owl::Literal {
+                                    datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
+                                    literal: Some(desc.into_string()),
+                                    lang: None,
+                                }
+                            )
+                        }
+                    )),
                 )
             ),
 
@@ -209,9 +223,8 @@ impl IntoOwlCtx for obo::HeaderClause {
             // obo::HeaderClause::OwlAxioms(_) => unimplemented!("cannot translate `owl-axioms` currently"),
             obo::HeaderClause::OwlAxioms(_) => None,
 
-            // no equivalent
-            // --> FIXME: namespace-id-rule ?
-            obo::HeaderClause::Unreserved(_, _) => None, // FIXME ?
+            // no equivalent for undefined header tag/values
+            obo::HeaderClause::Unreserved(_, _) => None,
         }
     }
 }
