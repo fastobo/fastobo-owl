@@ -64,7 +64,6 @@ pub mod property {
         pub const SAVED_BY: &'static str = concat!(oboInOwl!(), "savedBy");
         pub const SUBSET_PROPERTY: &'static str = concat!(oboInOwl!(), "SubsetProperty");
         pub const SYNONYM_TYPE_PROPERTY: &'static str = concat!(oboInOwl!(), "SynonymTypeProperty");
-        pub const XREF: &'static str = concat!(oboInOwl!(), "xref");
     }
 
     /// OWL2 annotation properties.

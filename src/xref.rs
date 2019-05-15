@@ -8,11 +8,14 @@ use crate::constants::property;
 use super::Context;
 use super::IntoOwlCtx;
 
+// FIXME: Xrefs should probably be translated as IRIs instead of literals now
+//        that Xrefs IDs have been formalized, but without an xref catalog
+//        it is likely IRI expansion will be faulty.
 impl IntoOwlCtx for obo::Xref {
     type Owl = owl::Annotation;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         owl::Annotation {
-            annotation_property: ctx.build.annotation_property(property::obo_in_owl::XREF),
+            annotation_property: ctx.build.annotation_property(property::obo_in_owl::HAS_DBXREF),
             annotation_value: owl::AnnotationValue::Literal(
                 owl::Literal {
                     lang: None,

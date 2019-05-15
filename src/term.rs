@@ -112,18 +112,23 @@ impl IntoOwlCtx for obo::TermClause {
                 }
             ),
 
-            // FIXME: add xrefs to translated axiom.
             obo::TermClause::Def(desc, xrefs) => OwlEntity::from(
-                owl::Annotation {
-                    annotation_property: ctx.build.annotation_property(
-                        property::iao::DEFINITION
+                owl::AnnotatedAxiom::new(
+                    owl::AnnotationAssertion::new(
+                        ctx.current_frame.clone(),
+                        owl::Annotation {
+                            annotation_property: ctx.build.annotation_property(
+                                property::iao::DEFINITION
+                            ),
+                            annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+                                datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
+                                literal: Some(desc.into_string()),
+                                lang: None,
+                            })
+                        },
                     ),
-                    annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                        literal: Some(desc.into_string()),
-                        lang: None,
-                    })
-                }
+                    xrefs.into_owl(ctx),
+                )
             ),
 
             obo::TermClause::Comment(comment) => OwlEntity::from(
