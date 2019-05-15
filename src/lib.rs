@@ -9,6 +9,7 @@ mod header;
 mod id;
 mod term;
 mod pv;
+mod xref;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
