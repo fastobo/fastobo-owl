@@ -21,7 +21,7 @@ impl IntoOwlCtx for obo::PrefixedIdent {
     }
 }
 
-/// Convert an `UnprefixedIdent` to an
+/// Convert an `UnprefixedIdent` to an OWL IRI using the ontology IRI.
 impl IntoOwlCtx for obo::UnprefixedIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {

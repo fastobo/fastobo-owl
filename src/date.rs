@@ -6,7 +6,6 @@ use crate::constants::datatype;
 use super::Context;
 use super::IntoOwlCtx;
 
-
 macro_rules! date_impl {
     ($type:ty) => {
         impl IntoOwlCtx for $type {
