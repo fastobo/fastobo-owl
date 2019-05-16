@@ -4,11 +4,13 @@ extern crate horned_owl;
 
 pub mod constants;
 
+mod date;
 mod doc;
 mod header;
 mod id;
 mod term;
 mod pv;
+mod strings;
 mod xref;
 
 use std::collections::HashMap;
