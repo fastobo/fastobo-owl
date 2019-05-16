@@ -51,7 +51,8 @@ macro_rules! converttest {
 
 
 
-converttest!(header);
-converttest!(name);
-converttest!(is_a);
+converttest!(def_xref);
 converttest!(equivalent_to);
+converttest!(header);
+converttest!(is_a);
+converttest!(name);
