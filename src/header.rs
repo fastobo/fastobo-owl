@@ -20,11 +20,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                         annotation_property: ctx.build.annotation_property(
                             property::obo_in_owl::HAS_OBO_FORMAT_VERSION
                         ),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                            literal: Some(v.into_string()),
-                            lang: None,
-                        })
+                        annotation_value: v.into_owl(ctx).into(),
                     }
                 )
             )),
@@ -39,11 +35,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                 owl::OntologyAnnotation(
                     owl::Annotation {
                         annotation_property: ctx.build.annotation_property(property::obo_in_owl::HAS_DATE),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(datatype::xsd::DATETIME)),
-                            lang: None,
-                            literal: Some(obo::DateTime::to_xsd_datetime(&dt)),
-                        })
+                        annotation_value: dt.into_owl(ctx).into(),
                     }
                 )
             )),
@@ -53,11 +45,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                 owl::OntologyAnnotation(
                     owl::Annotation {
                         annotation_property: ctx.build.annotation_property(property::obo_in_owl::SAVED_BY),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                            literal: Some(n.into_string()),
-                            lang: None,
-                        })
+                        annotation_value: n.into_owl(ctx).into(),
                     }
                 )
             )),
@@ -70,11 +58,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                         annotation_property: ctx.build.annotation_property(
                             property::obo_in_owl::AUTO_GENERATED_BY
                         ),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                            literal: Some(n.into_string()),
-                            lang: None,
-                        })
+                        annotation_value: n.into_owl(ctx).into()
                     }
                 )
             )),
@@ -85,10 +69,10 @@ impl IntoOwlCtx for obo::HeaderClause {
             obo::HeaderClause::Import(import) => Some(
                 owl::AnnotatedAxiom::from(
                     owl::Axiom::from(
-                        horned_owl::model::Import(import.into_owl(ctx)
+                        horned_owl::model::Import(import.into_owl(ctx))
                     )
                 )
-            )),
+            ),
 
             // `owl:AnnotationProperty`
             //     <owl:AnnotationProperty rdf:about=T(subset)>
@@ -113,13 +97,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                             annotation_property: ctx.build.annotation_property(
                                 property::rdfs::COMMENT
                             ),
-                            annotation_value: owl::AnnotationValue::Literal(
-                                owl::Literal {
-                                    datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                                    literal: Some(desc.into_string()),
-                                    lang: None,
-                                }
-                            )
+                            annotation_value: desc.into_owl(ctx).into(),
                         }
                     )),
                 )
@@ -166,6 +144,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                 )
             ),
 
+            // `oboInOwl:namespaceIdRule` annotation
             obo::HeaderClause::NamespaceIdRule(r) => Some(
                 owl::AnnotatedAxiom::from(
                     owl::OntologyAnnotation(
@@ -173,11 +152,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                             annotation_property: ctx.build.annotation_property(
                                 property::obo_in_owl::NAMESPACE_ID_RULE
                             ),
-                            annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                                datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                                literal: Some(r.into_string()),
-                                lang: None,
-                            })
+                            annotation_value: r.into_owl(ctx).into(),
                         }
                     )
                 )
@@ -186,7 +161,7 @@ impl IntoOwlCtx for obo::HeaderClause {
             // no actual OWL equivalent, but we expose the IDspace as an OWL
             // prefix to retain the same CURIES in the OWL ontology.
             // earlier when creating the conversion context.
-            obo::HeaderClause::Idspace(prefix, url, _) => None,
+            obo::HeaderClause::Idspace(_, _, _) => None,
 
             // no equivalent, macros should be resolved before conversion.
             obo::HeaderClause::TreatXrefsAsEquivalent(_) => None,
@@ -201,11 +176,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                 owl::OntologyAnnotation(
                     owl::Annotation {
                         annotation_property: ctx.build.annotation_property(property::rdfs::COMMENT),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                            datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                            literal: Some(v.into_string()),
-                            lang: None,
-                        })
+                        annotation_value: v.into_owl(ctx).into(),
                     }
                 )
             )),

@@ -159,16 +159,7 @@ impl IntoOwlCtx for obo::TermClause {
                     owl::Axiom::from(
                         owl::AnnotationAssertion{
                             annotation_subject: ctx.current_frame.clone(),
-                            annotation: owl::Annotation {
-                                annotation_property: ctx.build.annotation_property(
-                                    property::obo_in_owl::HAS_DBXREF
-                                ),
-                                annotation_value: owl::AnnotationValue::Literal(owl::Literal {
-                                    datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                                    literal: Some(xref.id().to_string()),
-                                    lang: None,
-                                }),
-                            }
+                            annotation: xref.clone().into_owl(ctx),
                         }
                     ),
                     BTreeSet::from_iter(
