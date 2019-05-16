@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use fastobo::ast as obo;
+use fastobo::ast::Identified;
 use fastobo::ext::OboSemantics;
 use horned_owl::model as owl;
 
@@ -31,7 +32,7 @@ impl IntoOwlCtx for obo::OboDoc {
         // Convert each entity to a set of OWL axioms that are then added to the ontology.
         let entities = std::mem::replace(self.entities_mut(), Default::default());
         for entity in entities.into_iter() {
-            ctx.current_frame = entity.id().clone().into_owl(ctx);
+            ctx.current_frame = entity.as_id().clone().into_owl(ctx);
             match entity {
                 obo::EntityFrame::Term(frame) => {
                     for axiom in frame.into_owl(ctx) {

@@ -19,7 +19,7 @@ repository = "fastobo/fastobo-owl"
 status     = "actively-developed"
 
 [dependencies]
-fastobo = { git = "https://github.com/althonos/fastobo" }
+fastobo = { git = "https://github.com/fastobo/fastobo" }
 horned-owl = { git = "https://github.com/althonos/horned-owl"}
 failure = "0.1.5"
 curie = "0.0.8"
