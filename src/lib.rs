@@ -55,31 +55,3 @@ struct Context {
     class_level: HashSet<owl::IRI>,
 
 }
-
-/// An entity produced by a certain clause.
-///
-/// Some OBO clauses are translated as annotations, some other are translated
-/// into axioms, and some have no translation.
-enum OwlEntity {
-    Annotation(owl::Annotation),
-    Axiom(owl::AnnotatedAxiom),
-    None
-}
-
-impl From<owl::Annotation> for OwlEntity {
-    fn from(a: owl::Annotation) -> Self {
-        OwlEntity::Annotation(a)
-    }
-}
-
-impl From<owl::Axiom> for OwlEntity {
-    fn from(a: owl::Axiom) -> Self {
-        OwlEntity::Axiom(owl::AnnotatedAxiom::from(a))
-    }
-}
-
-impl From<owl::AnnotatedAxiom> for OwlEntity {
-    fn from(a: owl::AnnotatedAxiom) -> Self {
-        OwlEntity::Axiom(a)
-    }
-}
