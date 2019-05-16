@@ -5,15 +5,14 @@ use fastobo::ast::Identified;
 use fastobo::ext::OboSemantics;
 use horned_owl::model as owl;
 
-use crate::constants::uri;
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
+use crate::constants::uri;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = owl::Ontology;
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
-
         let mut ont = owl::Ontology::new();
 
         // TODO: declare the IRI and Version IRI for the ontology.
@@ -23,7 +22,7 @@ impl IntoOwlCtx for obo::OboDoc {
         // }:
 
         // Convert the header frame: most frames end up as Ontology annotations,
-        /// but some of hem require extra axioms.
+        // but some of hem require extra axioms.
         let header = std::mem::replace(self.header_mut(), Default::default());
         for axiom in header.into_owl(ctx).into_iter().flatten() {
             ont.insert(axiom);
@@ -52,7 +51,6 @@ impl IntoOwlCtx for obo::OboDoc {
 impl IntoOwl for obo::OboDoc {
     type Owl = owl::Ontology;
     fn into_owl(mut self) -> Self::Owl {
-
         // Process the xref header macros.
         // Assigning the default namespace is not needed since we are only
         // processing the current document, so there should be no namespace
@@ -74,11 +72,11 @@ impl IntoOwl for obo::OboDoc {
         let mut idspaces = HashMap::new();
         idspaces.insert(
             obo::IdentPrefix::new("BFO"),
-            obo::Url::parse(&format!("{}BFO_", uri::OBO, )).unwrap()
+            obo::Url::parse(&format!("{}BFO_", uri::OBO,)).unwrap(),
         );
         idspaces.insert(
             obo::IdentPrefix::new("RO"),
-            obo::Url::parse(&format!("{}RO", uri::OBO, )).unwrap()
+            obo::Url::parse(&format!("{}RO", uri::OBO,)).unwrap(),
         );
 
         // Add the prefixes and IDspaces from the OBO header.

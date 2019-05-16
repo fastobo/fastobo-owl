@@ -4,14 +4,14 @@ use horned_owl::model as owl;
 use super::Context;
 use super::IntoOwlCtx;
 
-
 /// Convert a `PrefixedIdent` to an IRI using its IDspace or a default one.
 impl IntoOwlCtx for obo::PrefixedIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         let iri = match ctx.idspaces.get(self.prefix()) {
             Some(url) => format!("{}{}", url, self.local().as_str()),
-            None => format!("{}{}_{}",
+            None => format!(
+                "{}{}_{}",
                 crate::constants::uri::OBO,
                 self.prefix().as_str(),
                 self.local().as_str()
@@ -25,7 +25,8 @@ impl IntoOwlCtx for obo::PrefixedIdent {
 impl IntoOwlCtx for obo::UnprefixedIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
-        ctx.build.iri(format!("{}#{}", &ctx.ontology_iri, self.as_str()))
+        ctx.build
+            .iri(format!("{}#{}", &ctx.ontology_iri, self.as_str()))
     }
 }
 

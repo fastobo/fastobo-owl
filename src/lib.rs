@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 extern crate curie;
 extern crate fastobo;
 extern crate horned_owl;
@@ -8,9 +10,9 @@ mod date;
 mod doc;
 mod header;
 mod id;
-mod term;
 mod pv;
 mod strings;
+mod term;
 mod xref;
 
 use std::collections::HashMap;
@@ -37,12 +39,10 @@ pub trait IntoOwl {
 
 /// An opaque structure to pass context arguments required for OWL conversion.
 struct Context {
-
     ///
     build: owl::Build,
 
     // prefixes: curie::PrefixMapping,
-
     idspaces: HashMap<obo::IdentPrefix, obo::Url>,
 
     ontology_iri: obo::Url,
@@ -53,5 +53,4 @@ struct Context {
     ///
     /// This is likely to require processing imports beforehand.
     class_level: HashSet<owl::IRI>,
-
 }

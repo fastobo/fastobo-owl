@@ -1,9 +1,9 @@
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
-use crate::constants::datatype;
 use super::Context;
 use super::IntoOwlCtx;
+use crate::constants::datatype;
 
 macro_rules! string_impl {
     ($type:ty) => {
@@ -17,7 +17,7 @@ macro_rules! string_impl {
                 }
             }
         }
-    }
+    };
 }
 
 string_impl!(obo::QuotedString);

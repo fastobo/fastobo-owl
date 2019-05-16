@@ -2,9 +2,9 @@ use fastobo::ast as obo;
 use fastobo::ast::DateTime;
 use horned_owl::model as owl;
 
-use crate::constants::datatype;
 use super::Context;
 use super::IntoOwlCtx;
+use crate::constants::datatype;
 
 macro_rules! date_impl {
     ($type:ty) => {
@@ -18,7 +18,7 @@ macro_rules! date_impl {
                 }
             }
         }
-    }
+    };
 }
 
 date_impl!(obo::NaiveDateTime);

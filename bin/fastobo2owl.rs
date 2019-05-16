@@ -1,14 +1,13 @@
 extern crate curie;
-extern crate horned_owl;
 extern crate fastobo;
 extern crate fastobo_owl;
+extern crate horned_owl;
 
 use fastobo::ast::*;
-use fastobo_owl::IntoOwl;
 use fastobo_owl::constants::uri;
+use fastobo_owl::IntoOwl;
 
 fn main() {
-
     let mut prefixes = curie::PrefixMapping::default();
     prefixes.add_prefix("xsd", uri::XSD).unwrap();
     prefixes.add_prefix("owl", uri::OWL).unwrap();
@@ -20,11 +19,10 @@ fn main() {
     prefixes.add_prefix("rdfs", uri::RDFS).unwrap();
 
     for arg in std::env::args().skip(1) {
-
         let path = std::path::PathBuf::from(arg);
 
         // Parse the document
-        let mut obodoc = match OboDoc::from_file(&path) {
+        let obodoc = match OboDoc::from_file(&path) {
             Ok(doc) => doc,
             Err(e) => panic!("{:?} could not be parsed:\n{}", path, e),
         };
