@@ -48,3 +48,4 @@ converttest!(equivalent_to);
 converttest!(header);
 converttest!(is_a);
 converttest!(name);
+converttest!(union_of);

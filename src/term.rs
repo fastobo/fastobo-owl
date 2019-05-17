@@ -39,15 +39,50 @@ impl IntoOwlCtx for obo::TermFrame {
             },
         }));
 
-        // Group assertion clauses together:
-        // - IntersectionOf(Option<RelationIdent>, ClassIdent),
-        // - UnionOf(ClassIdent),
+        // Group some assertion clauses together
+        // FIXME: merge annotations as well !
+        let mut intersections: Vec<owl::ClassExpression> = Vec::new();
+        let mut unions: Vec<owl::ClassExpression> = Vec::new();
 
         // Convert remaining clauses to axioms.
         for line in self.into_iter() {
             if let Some(axiom) = line.into_inner().into_owl(ctx) {
-                axioms.insert(axiom);
+                if let owl::Axiom::EquivalentClasses(eq) = &axiom.axiom {
+                    match &eq.0[1] {
+                        owl::ClassExpression::ObjectIntersectionOf { o, .. } => {
+                            intersections.append(&mut o.clone());
+                        }
+                        owl::ClassExpression::ObjectUnionOf { o, .. } => {
+                            unions.append(&mut o.clone());
+                        }
+                        _ => {
+                            axioms.insert(axiom);
+                        }
+                    }
+                } else {
+                    axioms.insert(axiom);
+                }
             }
+        }
+
+        // Add all intersections as a single `EquivalentClasses` axiom.
+        if !intersections.is_empty() {
+            axioms.insert(owl::AnnotatedAxiom::from(owl::Axiom::EquivalentClasses(
+                owl::EquivalentClasses(vec![
+                    owl::ClassExpression::Class(owl::Class(id.clone())),
+                    owl::ClassExpression::ObjectIntersectionOf { o: intersections },
+                ]),
+            )));
+        }
+
+        // Add all unions as a single `EquivalentClasses` axiom.
+        if !unions.is_empty() {
+            axioms.insert(owl::AnnotatedAxiom::from(owl::Axiom::EquivalentClasses(
+                owl::EquivalentClasses(vec![
+                    owl::ClassExpression::Class(owl::Class(id.clone())),
+                    owl::ClassExpression::ObjectUnionOf { o: unions },
+                ]),
+            )));
         }
 
         // Return the axioms
@@ -171,7 +206,15 @@ impl IntoOwlCtx for obo::TermClause {
             })),
 
             // IntersectionOf(Option<RelationIdent>, ClassIdent),
-            // UnionOf(ClassIdent),
+
+            obo::TermClause::UnionOf(cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
+                    owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                    owl::ClassExpression::ObjectUnionOf {
+                        o: vec![owl::ClassExpression::from(owl::Class(cid.into_owl(ctx)))],
+                    },
+                ])))
+            }
 
             // FIXME: should be all grouped into a single axiom ?
             obo::TermClause::EquivalentTo(cid) => {
