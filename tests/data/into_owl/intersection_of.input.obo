@@ -1,0 +1,10 @@
+[Term]
+id: TST:01
+intersection_of: TST:02
+intersection_of: TST:03
+intersection_of: TST:04
+
+[Term]
+id: TST:02
+intersection_of: TST:05
+intersection_of: part_of TST:06

@@ -205,7 +205,25 @@ impl IntoOwlCtx for obo::TermClause {
                 sub_class: owl::ClassExpression::Class(owl::Class(ctx.current_frame.clone())),
             })),
 
-            // IntersectionOf(Option<RelationIdent>, ClassIdent),
+            // FIXME: requires qualifier check --> do that on line level.
+            obo::TermClause::IntersectionOf(rid, cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
+                    owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                    owl::ClassExpression::ObjectIntersectionOf {
+                        o: vec![match rid {
+                            None => owl::ClassExpression::from(owl::Class(cid.into_owl(ctx))),
+                            Some(r) => owl::ClassExpression::ObjectSomeValuesFrom {
+                                o: owl::ObjectPropertyExpression::ObjectProperty(
+                                    owl::ObjectProperty(obo::Ident::from(r).into_owl(ctx)),
+                                ),
+                                ce: Box::new(owl::ClassExpression::from(owl::Class(
+                                    cid.into_owl(ctx),
+                                ))),
+                            },
+                        }],
+                    },
+                ])))
+            }
 
             obo::TermClause::UnionOf(cid) => {
                 Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![

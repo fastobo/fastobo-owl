@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#">
+  <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
+  <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
+  <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+  <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+  <Declaration>
+      <Class IRI="http://purl.obolibrary.org/obo/TST_01"/>
+  </Declaration>
+  <Declaration>
+      <Class IRI="http://purl.obolibrary.org/obo/TST_02"/>
+  </Declaration>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:01</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
+    <AbbreviatedIRI>obo:TST_02</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:02</Literal>
+  </AnnotationAssertion>
+
+  <EquivalentClasses>
+    <Class abbreviatedIRI="obo:TST_01"/>
+    <ObjectIntersectionOf>
+      <Class abbreviatedIRI="obo:TST_02"/>
+      <Class abbreviatedIRI="obo:TST_03"/>
+      <Class abbreviatedIRI="obo:TST_04"/>
+    </ObjectIntersectionOf>
+  </EquivalentClasses>
+
+  <EquivalentClasses>
+    <Class abbreviatedIRI="obo:TST_02"/>
+    <ObjectIntersectionOf>
+      <Class abbreviatedIRI="obo:TST_05"/>
+      <ObjectSomeValuesFrom>
+        <ObjectProperty abbreviatedIRI="obo:#part_of"/>
+        <Class abbreviatedIRI="obo:TST_06"/>
+      </ObjectSomeValuesFrom>
+    </ObjectIntersectionOf>
+  </EquivalentClasses>
+
+</Ontology>

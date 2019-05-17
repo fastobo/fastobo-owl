@@ -46,6 +46,7 @@ macro_rules! converttest {
 converttest!(def_xref);
 converttest!(equivalent_to);
 converttest!(header);
+converttest!(intersection_of);
 converttest!(is_a);
 converttest!(name);
 converttest!(union_of);
