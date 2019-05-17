@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#">
+  <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
+  <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
+  <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+  <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+  <Declaration>
+      <Class IRI="http://purl.obolibrary.org/obo/TST_01"/>
+  </Declaration>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="rdfs:subPropertyOf"/>
+    <IRI>http://purl.obolibrary.org/obo/#systematic_synonym</IRI>
+    <IRI>http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty</IRI>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:01</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <Annotation>
+      <AnnotationProperty abbreviatedIRI="oboInOwl:hasDbXref"/>
+      <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">REF</Literal>
+    </Annotation>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasRelatedSynonym"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">something something</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <Annotation>
+      <AnnotationProperty abbreviatedIRI="oboInOwl:hasSynonymType"/>
+      <IRI>http://purl.obolibrary.org/obo/#systematic_synonym</IRI>
+    </Annotation>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasExactSynonym"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">something exact</Literal>
+  </AnnotationAssertion>
+
+</Ontology>

@@ -50,3 +50,4 @@ converttest!(intersection_of);
 converttest!(is_a);
 converttest!(name);
 converttest!(union_of);
+converttest!(synonym);

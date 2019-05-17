@@ -12,6 +12,7 @@ mod header;
 mod id;
 mod pv;
 mod strings;
+mod syn;
 mod term;
 mod xref;
 

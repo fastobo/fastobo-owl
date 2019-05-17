@@ -102,7 +102,8 @@ impl IntoOwlCtx for obo::TermClause {
     type Owl = Option<owl::AnnotatedAxiom>;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         match self {
-            // IsAnonymous(bool),
+            obo::TermClause::IsAnonymous(_) => None,
+
             obo::TermClause::Name(name) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     annotation_subject: ctx.current_frame.clone(),
@@ -311,6 +312,8 @@ impl IntoOwlCtx for obo::TermClause {
                     },
                 }))
             }
+
+            obo::TermClause::Synonym(syn) => Some(syn.into_owl(ctx)),
 
             _ => None,
         }

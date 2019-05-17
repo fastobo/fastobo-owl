@@ -1,0 +1,6 @@
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+
+[Term]
+id: TST:01
+synonym: "something something" RELATED [REF]
+synonym: "something exact" EXACT systematic_synonym []
