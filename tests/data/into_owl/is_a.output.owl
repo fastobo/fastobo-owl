@@ -28,10 +28,10 @@
   </AnnotationAssertion>
 
   <SubClassOf>
-    <!-- This is the superexpression -->
-      <Class abbreviatedIRI="obo:TST_001"/>
       <!-- This is the subexpression -->
       <Class abbreviatedIRI="obo:TST_002"/>
+      <!-- This is the superexpression -->
+      <Class abbreviatedIRI="obo:TST_001"/>
   </SubClassOf>
 
 </Ontology>

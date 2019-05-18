@@ -160,8 +160,8 @@ impl IntoOwlCtx for obo::HeaderClause {
                 owl::OntologyAnnotation(pv.into_owl(ctx)),
             )),
 
-            // no equivalent:
-            // --> should be added as the Ontology IRI
+            // no actual OWL equivalent, but exposed as the Ontology IRI
+            // when creating the conversion context.
             obo::HeaderClause::Ontology(_) => None,
 
             // should be added as-is but needs a Manchester-syntax parser
