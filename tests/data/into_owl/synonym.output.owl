@@ -10,7 +10,7 @@
 
   <AnnotationAssertion>
     <AnnotationProperty abbreviatedIRI="rdfs:subPropertyOf"/>
-    <IRI>http://purl.obolibrary.org/obo/#systematic_synonym</IRI>
+    <IRI>http://purl.obolibrary.org/obo/tst#systematic_synonym</IRI>
     <IRI>http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty</IRI>
   </AnnotationAssertion>
 
@@ -33,7 +33,7 @@
   <AnnotationAssertion>
     <Annotation>
       <AnnotationProperty abbreviatedIRI="oboInOwl:hasSynonymType"/>
-      <IRI>http://purl.obolibrary.org/obo/#systematic_synonym</IRI>
+      <IRI>http://purl.obolibrary.org/obo/tst#systematic_synonym</IRI>
     </Annotation>
     <AnnotationProperty abbreviatedIRI="oboInOwl:hasExactSynonym"/>
     <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>

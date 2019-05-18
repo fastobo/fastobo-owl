@@ -37,7 +37,7 @@
     <ObjectIntersectionOf>
       <Class abbreviatedIRI="obo:TST_05"/>
       <ObjectSomeValuesFrom>
-        <ObjectProperty abbreviatedIRI="obo:#part_of"/>
+        <ObjectProperty abbreviatedIRI="obo:tst#part_of"/>
         <Class abbreviatedIRI="obo:TST_06"/>
       </ObjectSomeValuesFrom>
     </ObjectIntersectionOf>

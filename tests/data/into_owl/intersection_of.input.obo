@@ -1,3 +1,5 @@
+ontology: tst
+
 [Term]
 id: TST:01
 intersection_of: TST:02
