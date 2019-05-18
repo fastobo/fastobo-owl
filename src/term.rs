@@ -13,7 +13,7 @@ impl IntoOwlCtx for obo::TermFrame {
     type Owl = BTreeSet<owl::AnnotatedAxiom>;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         // The ID of this frame translated to an IRI.
-        let id = obo::Ident::from(self.id().clone().into_inner()).into_owl(ctx);
+        let id = self.id().clone().into_inner().into_owl(ctx);
 
         // The translated axioms.
         let mut axioms: Self::Owl = BTreeSet::new();
@@ -93,7 +93,8 @@ impl IntoOwlCtx for obo::TermFrame {
 impl IntoOwlCtx for obo::Line<obo::TermClause> {
     type Owl = Option<owl::AnnotatedAxiom>;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
-        // FIXME: handle con
+        // FIXME: handle qualifiers that have semantic value other than
+        //        simple annotations.
         self.into_inner().into_owl(ctx)
     }
 }
@@ -103,6 +104,8 @@ impl IntoOwlCtx for obo::TermClause {
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         match self {
             obo::TermClause::IsAnonymous(_) => None,
+
+            obo::TermClause::Builtin(_) => None,
 
             obo::TermClause::Name(name) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
@@ -129,6 +132,7 @@ impl IntoOwlCtx for obo::TermClause {
                     },
                 }))
             }
+
             obo::TermClause::AltId(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     annotation_subject: ctx.current_frame.clone(),
@@ -167,6 +171,7 @@ impl IntoOwlCtx for obo::TermClause {
                     },
                 }))
             }
+
             obo::TermClause::Subset(subset) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     annotation_subject: ctx.current_frame.clone(),
@@ -174,9 +179,7 @@ impl IntoOwlCtx for obo::TermClause {
                         annotation_property: ctx
                             .build
                             .annotation_property(property::obo_in_owl::IN_SUBSET),
-                        annotation_value: owl::AnnotationValue::IRI(
-                            obo::Ident::from(subset).into_owl(ctx),
-                        ),
+                        annotation_value: owl::AnnotationValue::IRI(subset.into_owl(ctx)),
                     },
                 }))
             }
@@ -192,8 +195,6 @@ impl IntoOwlCtx for obo::TermClause {
                 })),
             )),
 
-            obo::TermClause::Builtin(_) => None,
-
             obo::TermClause::PropertyValue(pv) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     annotation_subject: ctx.current_frame.clone(),
@@ -205,35 +206,6 @@ impl IntoOwlCtx for obo::TermClause {
                 super_class: owl::ClassExpression::Class(owl::Class(supercls.into_owl(ctx))),
                 sub_class: owl::ClassExpression::Class(owl::Class(ctx.current_frame.clone())),
             })),
-
-            // FIXME: requires qualifier check --> do that on line level.
-            obo::TermClause::IntersectionOf(rid, cid) => {
-                Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
-                    owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
-                    owl::ClassExpression::ObjectIntersectionOf {
-                        o: vec![match rid {
-                            None => owl::ClassExpression::from(owl::Class(cid.into_owl(ctx))),
-                            Some(r) => owl::ClassExpression::ObjectSomeValuesFrom {
-                                o: owl::ObjectPropertyExpression::ObjectProperty(
-                                    owl::ObjectProperty(obo::Ident::from(r).into_owl(ctx)),
-                                ),
-                                ce: Box::new(owl::ClassExpression::from(owl::Class(
-                                    cid.into_owl(ctx),
-                                ))),
-                            },
-                        }],
-                    },
-                ])))
-            }
-
-            obo::TermClause::UnionOf(cid) => {
-                Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
-                    owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
-                    owl::ClassExpression::ObjectUnionOf {
-                        o: vec![owl::ClassExpression::from(owl::Class(cid.into_owl(ctx)))],
-                    },
-                ])))
-            }
 
             // FIXME: should be all grouped into a single axiom ?
             obo::TermClause::EquivalentTo(cid) => {
@@ -250,7 +222,6 @@ impl IntoOwlCtx for obo::TermClause {
                 ])))
             }
 
-            // Relationship(RelationIdent, ClassIdent),
             obo::TermClause::IsObsolete(b) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     annotation_subject: ctx.current_frame.clone(),
@@ -286,9 +257,7 @@ impl IntoOwlCtx for obo::TermClause {
                         annotation_property: ctx
                             .build
                             .annotation_property(property::obo_in_owl::CONSIDER),
-                        annotation_value: owl::AnnotationValue::IRI(
-                            obo::Ident::from(id).into_owl(ctx),
-                        ),
+                        annotation_value: owl::AnnotationValue::IRI(id.into_owl(ctx)),
                     },
                 }))
             }
@@ -315,7 +284,45 @@ impl IntoOwlCtx for obo::TermClause {
 
             obo::TermClause::Synonym(syn) => Some(syn.into_owl(ctx)),
 
-            _ => None,
+            // FIXME: requires qualifier check --> do that on line level.
+            obo::TermClause::IntersectionOf(rid, cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
+                    owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                    owl::ClassExpression::ObjectIntersectionOf {
+                        o: vec![match rid {
+                            None => owl::ClassExpression::from(owl::Class(cid.into_owl(ctx))),
+                            Some(r) => owl::ClassExpression::ObjectSomeValuesFrom {
+                                o: owl::ObjectPropertyExpression::ObjectProperty(
+                                    owl::ObjectProperty(r.into_owl(ctx)),
+                                ),
+                                ce: Box::new(owl::ClassExpression::from(owl::Class(
+                                    cid.into_owl(ctx),
+                                ))),
+                            },
+                        }],
+                    },
+                ])))
+            }
+
+            obo::TermClause::UnionOf(cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
+                    owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                    owl::ClassExpression::ObjectUnionOf {
+                        o: vec![owl::ClassExpression::from(owl::Class(cid.into_owl(ctx)))],
+                    },
+                ])))
+            }
+
+            // FIXME: requires qualifier check --> do that on line level.
+            obo::TermClause::Relationship(rid, cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::SubClassOf {
+                    sub_class: owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
+                    super_class: owl::ClassExpression::ObjectSomeValuesFrom {
+                        o: owl::ObjectPropertyExpression::ObjectProperty(rid.into_owl(ctx).into()),
+                        ce: Box::new(owl::ClassExpression::Class(cid.into_owl(ctx).into())),
+                    },
+                }))
+            }
         }
     }
 }

@@ -59,6 +59,14 @@ impl IntoOwlCtx for obo::ClassIdent {
 }
 
 /// Convert a subset identifier to an OWL IRI.
+impl IntoOwlCtx for obo::RelationIdent {
+    type Owl = owl::IRI;
+    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+        obo::Ident::from(self).into_owl(ctx)
+    }
+}
+
+/// Convert a subset identifier to an OWL IRI.
 impl IntoOwlCtx for obo::SubsetIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
