@@ -49,5 +49,6 @@ converttest!(header);
 converttest!(intersection_of);
 converttest!(is_a);
 converttest!(name);
+converttest!(qualifier);
 converttest!(union_of);
 converttest!(synonym);

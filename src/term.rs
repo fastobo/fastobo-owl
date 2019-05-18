@@ -46,7 +46,7 @@ impl IntoOwlCtx for obo::TermFrame {
 
         // Convert remaining clauses to axioms.
         for line in self.into_iter() {
-            if let Some(axiom) = line.into_inner().into_owl(ctx) {
+            if let Some(axiom) = line.into_owl(ctx) {
                 if let owl::Axiom::EquivalentClasses(eq) = &axiom.axiom {
                     match &eq.0[1] {
                         owl::ClassExpression::ObjectIntersectionOf { o, .. } => {
@@ -92,10 +92,20 @@ impl IntoOwlCtx for obo::TermFrame {
 
 impl IntoOwlCtx for obo::Line<obo::TermClause> {
     type Owl = Option<owl::AnnotatedAxiom>;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+    fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
+        // Take ownership of qualifiers list.
+        let mut qualifiers = match self.qualifiers_mut() {
+            Some(q) => std::mem::replace(q, obo::QualifierList::default()),
+            None => obo::QualifierList::default(),
+        };
         // FIXME: handle qualifiers that have semantic value other than
         //        simple annotations.
-        self.into_inner().into_owl(ctx)
+        if let Some(mut axiom) = self.into_inner().into_owl(ctx) {
+            axiom.annotation.append(&mut qualifiers.into_owl(ctx));
+            Some(axiom)
+        } else {
+            None
+        }
     }
 }
 

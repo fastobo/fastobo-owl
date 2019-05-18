@@ -11,6 +11,7 @@ mod doc;
 mod header;
 mod id;
 mod pv;
+mod qualifier;
 mod strings;
 mod syn;
 mod term;
