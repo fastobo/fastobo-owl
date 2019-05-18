@@ -78,18 +78,28 @@ impl IntoOwl for obo::OboDoc {
             obo::IdentPrefix::new("RO"),
             obo::Url::parse(&format!("{}RO", uri::OBO,)).unwrap(),
         );
+        idspaces.insert(
+            obo::IdentPrefix::new("xsd"),
+            obo::Url::parse(uri::XSD).unwrap(),
+        );
 
         // Add the prefixes and IDspaces from the OBO header.
+        let mut ontology = None;
         for clause in self.header() {
-            if let obo::HeaderClause::Idspace(prefix, url, _) = clause {
-                // prefixes.add_prefix(prefix.as_str(), url.as_str()).unwrap();
-                idspaces.insert(prefix.clone(), url.clone());
+            match clause {
+                obo::HeaderClause::Idspace(prefix, url, _) => {
+                    idspaces.insert(prefix.clone(), url.clone());
+                }
+                obo::HeaderClause::Ontology(id) => {
+                    ontology = Some(id.to_string());
+                }
+                _ => (),
             }
         }
 
         // Create the conversion context.
         let build: horned_owl::model::Build = Default::default();
-        let ontology_iri = obo::Url::parse(uri::OBO).unwrap(); // FIXME
+        let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.clone().into_string());
         let class_level = Default::default(); // FIXME
         let mut ctx = Context {
