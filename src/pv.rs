@@ -8,11 +8,11 @@ impl IntoOwlCtx for obo::PropertyValue {
     type Owl = owl::Annotation;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         match self {
-            obo::PropertyValue::Identified(rel, id) => owl::Annotation {
+            obo::PropertyValue::Resource(rel, id) => owl::Annotation {
                 annotation_property: owl::AnnotationProperty(obo::Ident::from(rel).into_owl(ctx)),
                 annotation_value: owl::AnnotationValue::IRI(id.into_owl(ctx)),
             },
-            obo::PropertyValue::Typed(rel, value, dty) => owl::Annotation {
+            obo::PropertyValue::Literal(rel, value, dty) => owl::Annotation {
                 annotation_property: owl::AnnotationProperty(obo::Ident::from(rel).into_owl(ctx)),
                 annotation_value: owl::AnnotationValue::Literal(owl::Literal {
                     datatype_iri: Some(dty.into_owl(ctx)),
