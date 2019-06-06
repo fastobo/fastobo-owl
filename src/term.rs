@@ -59,7 +59,7 @@ fn make_relationship_axiom(
     if let Some(qa) = qualifiers.iter().find(|q| q.key() == &*MIN_CARDINALITY) {
         let na = qa.value().parse().expect("invalid value for `min_cardinality`");
         if let Some(qb) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
-            let nb = qa.value().parse().expect("invalid value for `max_cardinality`");;
+            let nb = qb.value().parse().expect("invalid value for `max_cardinality`");;
             return owl::ClassExpression::ObjectIntersectionOf {
                 o: vec![
                     owl::ClassExpression::ObjectMinCardinality {
@@ -191,7 +191,7 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
     type Owl = Option<owl::AnnotatedAxiom>;
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
         // Take ownership of qualifiers list.
-        let mut qualifiers = match self.qualifiers_mut() {
+        let qualifiers = match self.qualifiers_mut() {
             Some(q) => std::mem::replace(q, obo::QualifierList::default()),
             None => obo::QualifierList::default(),
         };
