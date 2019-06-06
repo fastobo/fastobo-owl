@@ -3,6 +3,8 @@
 extern crate curie;
 extern crate fastobo;
 extern crate horned_owl;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod constants;
 

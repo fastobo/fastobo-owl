@@ -7,18 +7,22 @@ use super::Context;
 use super::IntoOwlCtx;
 use crate::constants::datatype;
 
-const EXCLUDED: [&str; 5] = [
-    "cardinality",
-    "minCardinality",
-    "maxCardinality",
-    "gci_relation",
-    "gci_filler",
-];
+lazy_static! {
+    static ref EXCLUDED: BTreeSet<obo::RelationIdent> = {
+        let mut s = BTreeSet::new();
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("cardinality")));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("minCardinality")));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("maxCardinality")));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("gci_relation")));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("gci_filler")));
+        s
+    };
+}
 
 impl IntoOwlCtx for obo::Qualifier {
     type Owl = Option<owl::Annotation>;
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
-        if !EXCLUDED.contains(&self.key().to_string().as_str()) {
+        if !EXCLUDED.contains(self.key()) {
             // Take ownership of key and value without extra heap allocation.
             let key = std::mem::replace(
                 self.key_mut(),

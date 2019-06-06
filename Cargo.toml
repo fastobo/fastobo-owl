@@ -24,10 +24,10 @@ horned-owl = { git = "https://github.com/althonos/horned-owl", branch = "dev" }
 failure = "0.1.5"
 curie = "0.0.8"
 either = "1.5.2"
+lazy_static = "1.3.0"
 
 [dev-dependencies]
 curie = "0.0.8"
-lazy_static = "1.3.0"
 pretty_assertions = "0.6.1"
 
 [[bin]]
