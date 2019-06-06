@@ -9,6 +9,103 @@ use super::IntoOwlCtx;
 use crate::constants::datatype;
 use crate::constants::property;
 
+lazy_static! {
+    static ref CARDINALITY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("cardinality"));
+    static ref MIN_CARDINALITY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("minCardinality"));
+    static ref MAX_CARDINALITY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("maxCardinality"));
+    static ref ALL_ONLY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("all_only"));
+    static ref ALL_SOME: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("all_some"));
+}
+
+fn make_relationship_axiom(
+    qualifiers: &obo::QualifierList,
+    relation: owl::ObjectPropertyExpression,
+    cls: Box<owl::ClassExpression>,
+) -> owl::ClassExpression {
+
+    //
+    if let Some(q) = qualifiers.iter().find(|q| q.key() == &*CARDINALITY) {
+        let n: i32 = q.value().parse().expect("invalid value for `cardinality`");
+        if n == 0 {
+            return owl::ClassExpression::ObjectAllValuesFrom {
+                o: relation,
+                ce: Box::new(owl::ClassExpression::ObjectComplementOf {
+                    ce: cls
+                })
+            };
+        } else {
+            return owl::ClassExpression::ObjectExactCardinality {
+                n,
+                o: relation,
+                ce: cls
+            };
+        }
+    }
+
+    //
+    if let Some(q) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
+        let na: i32 = q.value().parse().expect("invalid value for `maxCardinality`");
+        if na == 0 {
+            return owl::ClassExpression::ObjectAllValuesFrom {
+                o: relation,
+                ce: Box::new(owl::ClassExpression::ObjectComplementOf {
+                    ce: cls
+                })
+            };
+        }
+    }
+
+    //
+    if let Some(qa) = qualifiers.iter().find(|q| q.key() == &*MIN_CARDINALITY) {
+        let na = qa.value().parse().expect("invalid value for `min_cardinality`");
+        if let Some(qb) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
+            let nb = qa.value().parse().expect("invalid value for `max_cardinality`");;
+            return owl::ClassExpression::ObjectIntersectionOf {
+                o: vec![
+                    owl::ClassExpression::ObjectMinCardinality {
+                        n: na,
+                        o: relation.clone(),
+                        ce: cls.clone(),
+                    },
+                    owl::ClassExpression::ObjectMaxCardinality {
+                        n: nb,
+                        o: relation,
+                        ce: cls,
+                    },
+                ]
+            };
+        } else {
+            return owl::ClassExpression::ObjectMinCardinality {
+                n: na,
+                o: relation,
+                ce: cls,
+            };
+        }
+    }
+
+    //
+    if let Some(q) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
+        return owl::ClassExpression::ObjectMaxCardinality {
+            n: q.value().parse().expect("invalid value for `maxCardinality`"),
+            o: relation,
+            ce: Box::new(owl::ClassExpression::ObjectComplementOf {
+                ce: cls
+            })
+        };
+    }
+
+    // FIXME: all_only / all_some
+    // FIXME: all_some
+    // FIXME: is_class_level
+
+    //
+    owl::ClassExpression::ObjectSomeValuesFrom {
+        o: relation,
+        ce: cls
+    }
+}
+
+
 impl IntoOwlCtx for obo::TermFrame {
     type Owl = BTreeSet<owl::AnnotatedAxiom>;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
@@ -101,6 +198,21 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
         // FIXME: handle qualifiers that have semantic value other than
         //        simple annotations.
         if let Some(mut axiom) = self.into_inner().into_owl(ctx) {
+
+            //
+            if let owl::Axiom::SubClassOf(owl::SubClassOf {
+                sub_class: owl::ClassExpression::Class(sub),
+                super_class: owl::ClassExpression::ObjectSomeValuesFrom {
+                    o: relation,
+                    ce: cls
+                },
+            }) = axiom.axiom {
+                axiom.axiom = owl::Axiom::SubClassOf(owl::SubClassOf {
+                    sub_class: owl::ClassExpression::Class(sub),
+                    super_class: make_relationship_axiom(&qualifiers, relation, cls)
+                });
+            }
+
             axiom.annotation.append(&mut qualifiers.into_owl(ctx));
             Some(axiom)
         } else {
