@@ -23,7 +23,6 @@ fn make_relationship_axiom(
     cls: Box<owl::ClassExpression>,
 ) -> owl::ClassExpression {
 
-    //
     if let Some(q) = qualifiers.iter().find(|q| q.key() == &*CARDINALITY) {
         let n: i32 = q.value().parse().expect("invalid value for `cardinality`");
         if n == 0 {
@@ -42,7 +41,6 @@ fn make_relationship_axiom(
         }
     }
 
-    //
     if let Some(q) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
         let na: i32 = q.value().parse().expect("invalid value for `maxCardinality`");
         if na == 0 {
@@ -55,7 +53,6 @@ fn make_relationship_axiom(
         }
     }
 
-    //
     if let Some(qa) = qualifiers.iter().find(|q| q.key() == &*MIN_CARDINALITY) {
         let na = qa.value().parse().expect("invalid value for `min_cardinality`");
         if let Some(qb) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
@@ -83,7 +80,6 @@ fn make_relationship_axiom(
         }
     }
 
-    //
     if let Some(q) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
         return owl::ClassExpression::ObjectMaxCardinality {
             n: q.value().parse().expect("invalid value for `maxCardinality`"),
@@ -94,8 +90,28 @@ fn make_relationship_axiom(
         };
     }
 
-    // FIXME: all_only / all_some
-    // FIXME: all_some
+    if let Some(q_only) = qualifiers.iter().find(|q| q.key() == &*ALL_ONLY) {
+        if let Some(q_some) = qualifiers.iter().find(|q| q.key() == &*ALL_SOME) {
+            return owl::ClassExpression::ObjectIntersectionOf {
+                o: vec![
+                    owl::ClassExpression::ObjectSomeValuesFrom {
+                        o: relation.clone(),
+                        ce: cls.clone()
+                    },
+                    owl::ClassExpression::ObjectAllValuesFrom {
+                        o: relation,
+                        ce: cls
+                    }
+                ]
+            };
+        } else {
+            return owl::ClassExpression::ObjectAllValuesFrom {
+                o: relation,
+                ce: cls
+            };
+        }
+    }
+
     // FIXME: is_class_level
 
     //
@@ -139,18 +155,22 @@ impl IntoOwlCtx for obo::TermFrame {
         // Group some assertion clauses together
         // FIXME: merge annotations as well !
         let mut intersections: Vec<owl::ClassExpression> = Vec::new();
+        let mut intersections_a: BTreeSet<owl::Annotation> = BTreeSet::new();
         let mut unions: Vec<owl::ClassExpression> = Vec::new();
+        let mut unions_a: BTreeSet<owl::Annotation> = BTreeSet::new();
 
         // Convert remaining clauses to axioms.
         for line in self.into_iter() {
-            if let Some(axiom) = line.into_owl(ctx) {
+            if let Some(mut axiom) = line.into_owl(ctx) {
                 if let owl::Axiom::EquivalentClasses(eq) = &axiom.axiom {
                     match &eq.0[1] {
                         owl::ClassExpression::ObjectIntersectionOf { o, .. } => {
                             intersections.append(&mut o.clone());
+                            intersections_a.append(&mut axiom.annotation);
                         }
                         owl::ClassExpression::ObjectUnionOf { o, .. } => {
                             unions.append(&mut o.clone());
+                            unions_a.append(&mut axiom.annotation);
                         }
                         _ => {
                             axioms.insert(axiom);
@@ -164,22 +184,28 @@ impl IntoOwlCtx for obo::TermFrame {
 
         // Add all intersections as a single `EquivalentClasses` axiom.
         if !intersections.is_empty() {
-            axioms.insert(owl::AnnotatedAxiom::from(owl::Axiom::EquivalentClasses(
-                owl::EquivalentClasses(vec![
-                    owl::ClassExpression::Class(owl::Class(id.clone())),
-                    owl::ClassExpression::ObjectIntersectionOf { o: intersections },
-                ]),
-            )));
+            axioms.insert(owl::AnnotatedAxiom::new(
+                owl::Axiom::EquivalentClasses(
+                    owl::EquivalentClasses(vec![
+                        owl::ClassExpression::Class(owl::Class(id.clone())),
+                        owl::ClassExpression::ObjectIntersectionOf { o: intersections },
+                    ]),
+                ),
+                intersections_a
+            ));
         }
 
         // Add all unions as a single `EquivalentClasses` axiom.
         if !unions.is_empty() {
-            axioms.insert(owl::AnnotatedAxiom::from(owl::Axiom::EquivalentClasses(
-                owl::EquivalentClasses(vec![
-                    owl::ClassExpression::Class(owl::Class(id.clone())),
-                    owl::ClassExpression::ObjectUnionOf { o: unions },
-                ]),
-            )));
+            axioms.insert(owl::AnnotatedAxiom::new(
+                owl::Axiom::EquivalentClasses(
+                    owl::EquivalentClasses(vec![
+                        owl::ClassExpression::Class(owl::Class(id.clone())),
+                        owl::ClassExpression::ObjectUnionOf { o: unions },
+                    ]),
+                ),
+                unions_a,
+            ));
         }
 
         // Return the axioms
@@ -435,7 +461,6 @@ impl IntoOwlCtx for obo::TermClause {
                 ])))
             }
 
-            // FIXME: requires qualifier check --> do that on line level.
             obo::TermClause::Relationship(rid, cid) => {
                 Some(owl::AnnotatedAxiom::from(owl::SubClassOf {
                     sub_class: owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
