@@ -5,11 +5,16 @@ use fastobo::ast as obo;
 use horned_owl::model as owl;
 
 lazy_static! {
-    static ref CARDINALITY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("cardinality"));
-    static ref MIN_CARDINALITY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("minCardinality"));
-    static ref MAX_CARDINALITY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("maxCardinality"));
-    static ref ALL_ONLY: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("all_only"));
-    static ref ALL_SOME: obo::RelationIdent = obo::RelationIdent::from(obo::UnprefixedIdent::new("all_some"));
+    static ref CARDINALITY: obo::RelationIdent =
+        obo::RelationIdent::from(obo::UnprefixedIdent::new("cardinality"));
+    static ref MIN_CARDINALITY: obo::RelationIdent =
+        obo::RelationIdent::from(obo::UnprefixedIdent::new("minCardinality"));
+    static ref MAX_CARDINALITY: obo::RelationIdent =
+        obo::RelationIdent::from(obo::UnprefixedIdent::new("maxCardinality"));
+    static ref ALL_ONLY: obo::RelationIdent =
+        obo::RelationIdent::from(obo::UnprefixedIdent::new("all_only"));
+    static ref ALL_SOME: obo::RelationIdent =
+        obo::RelationIdent::from(obo::UnprefixedIdent::new("all_some"));
 }
 
 /// An opaque structure to pass context arguments required for OWL conversion.
@@ -41,41 +46,45 @@ impl Context {
         relation: owl::ObjectProperty,
         cls: Box<owl::ClassExpression>,
     ) -> owl::ClassExpression {
-
         if let Some(q) = qualifiers.iter().find(|q| q.key() == &*CARDINALITY) {
             let n: i32 = q.value().parse().expect("invalid value for `cardinality`");
             if n == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                    ce: Box::new(owl::ClassExpression::ObjectComplementOf {
-                        ce: cls
-                    })
+                    ce: Box::new(owl::ClassExpression::ObjectComplementOf { ce: cls }),
                 };
             } else {
                 return owl::ClassExpression::ObjectExactCardinality {
                     n,
                     o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                    ce: cls
+                    ce: cls,
                 };
             }
         }
 
         if let Some(q) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
-            let na: i32 = q.value().parse().expect("invalid value for `maxCardinality`");
+            let na: i32 = q
+                .value()
+                .parse()
+                .expect("invalid value for `maxCardinality`");
             if na == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                    ce: Box::new(owl::ClassExpression::ObjectComplementOf {
-                        ce: cls
-                    })
+                    ce: Box::new(owl::ClassExpression::ObjectComplementOf { ce: cls }),
                 };
             }
         }
 
         if let Some(qa) = qualifiers.iter().find(|q| q.key() == &*MIN_CARDINALITY) {
-            let na = qa.value().parse().expect("invalid value for `min_cardinality`");
+            let na = qa
+                .value()
+                .parse()
+                .expect("invalid value for `min_cardinality`");
             if let Some(qb) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
-                let nb = qb.value().parse().expect("invalid value for `max_cardinality`");;
+                let nb = qb
+                    .value()
+                    .parse()
+                    .expect("invalid value for `max_cardinality`");;
                 return owl::ClassExpression::ObjectIntersectionOf {
                     o: vec![
                         owl::ClassExpression::ObjectMinCardinality {
@@ -88,7 +97,7 @@ impl Context {
                             o: owl::ObjectPropertyExpression::ObjectProperty(relation),
                             ce: cls,
                         },
-                    ]
+                    ],
                 };
             } else {
                 return owl::ClassExpression::ObjectMinCardinality {
@@ -101,11 +110,11 @@ impl Context {
 
         if let Some(q) = qualifiers.iter().find(|q| q.key() == &*MAX_CARDINALITY) {
             return owl::ClassExpression::ObjectMaxCardinality {
-                n: q.value().parse().expect("invalid value for `maxCardinality`"),
+                n: q.value()
+                    .parse()
+                    .expect("invalid value for `maxCardinality`"),
                 o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                ce: Box::new(owl::ClassExpression::ObjectComplementOf {
-                    ce: cls
-                })
+                ce: Box::new(owl::ClassExpression::ObjectComplementOf { ce: cls }),
             };
         }
 
@@ -115,18 +124,18 @@ impl Context {
                     o: vec![
                         owl::ClassExpression::ObjectSomeValuesFrom {
                             o: owl::ObjectPropertyExpression::ObjectProperty(relation.clone()),
-                            ce: cls.clone()
+                            ce: cls.clone(),
                         },
                         owl::ClassExpression::ObjectAllValuesFrom {
                             o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                            ce: cls
-                        }
-                    ]
+                            ce: cls,
+                        },
+                    ],
                 };
             } else {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                    ce: cls
+                    ce: cls,
                 };
             }
         }
@@ -138,12 +147,12 @@ impl Context {
                 i: match *cls {
                     owl::ClassExpression::Class(c) => owl::NamedIndividual(c.0),
                     _ => unreachable!(),
-                }
+                },
             }
         } else {
             owl::ClassExpression::ObjectSomeValuesFrom {
                 o: owl::ObjectPropertyExpression::ObjectProperty(relation),
-                ce: cls
+                ce: cls,
             }
         }
     }

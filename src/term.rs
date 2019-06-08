@@ -72,25 +72,21 @@ impl IntoOwlCtx for obo::TermFrame {
         // Add all intersections as a single `EquivalentClasses` axiom.
         if !intersections.is_empty() {
             axioms.insert(owl::AnnotatedAxiom::new(
-                owl::Axiom::EquivalentClasses(
-                    owl::EquivalentClasses(vec![
-                        owl::ClassExpression::Class(owl::Class(id.clone())),
-                        owl::ClassExpression::ObjectIntersectionOf { o: intersections },
-                    ]),
-                ),
-                intersections_a
+                owl::Axiom::EquivalentClasses(owl::EquivalentClasses(vec![
+                    owl::ClassExpression::Class(owl::Class(id.clone())),
+                    owl::ClassExpression::ObjectIntersectionOf { o: intersections },
+                ])),
+                intersections_a,
             ));
         }
 
         // Add all unions as a single `EquivalentClasses` axiom.
         if !unions.is_empty() {
             axioms.insert(owl::AnnotatedAxiom::new(
-                owl::Axiom::EquivalentClasses(
-                    owl::EquivalentClasses(vec![
-                        owl::ClassExpression::Class(owl::Class(id.clone())),
-                        owl::ClassExpression::ObjectUnionOf { o: unions },
-                    ]),
-                ),
+                owl::Axiom::EquivalentClasses(owl::EquivalentClasses(vec![
+                    owl::ClassExpression::Class(owl::Class(id.clone())),
+                    owl::ClassExpression::ObjectUnionOf { o: unions },
+                ])),
                 unions_a,
             ));
         }
@@ -111,25 +107,45 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
         // FIXME: handle qualifiers that have semantic value other than
         //        simple annotations.
         if let Some(mut axiom) = self.into_inner().into_owl(ctx) {
-
-            // Transform the class expression of a translated `relationship`
-            // clause depending on the qualifiers.
-            if let owl::Axiom::SubClassOf(owl::SubClassOf {
-                sub_class: owl::ClassExpression::Class(sub),
-                super_class: owl::ClassExpression::ObjectSomeValuesFrom {
-                    o: relation,
-                    ce: cls
-                },
-            }) = axiom.axiom {
-                let r = match relation {
-                    owl::ObjectPropertyExpression::ObjectProperty(r) => r,
-                    _ => unreachable!(),
-                };
-                axiom.axiom = owl::Axiom::SubClassOf(owl::SubClassOf {
+            match axiom.axiom {
+                // Transform the class expression of a translated `relationship`
+                owl::Axiom::SubClassOf(owl::SubClassOf {
                     sub_class: owl::ClassExpression::Class(sub),
-                    super_class: ctx.rel_class_expression(&qualifiers, r, cls)
-                });
-            }
+                    super_class:
+                        owl::ClassExpression::ObjectSomeValuesFrom {
+                            o: owl::ObjectPropertyExpression::ObjectProperty(r),
+                            ce: cls,
+                        },
+                }) => {
+                    axiom.axiom = owl::Axiom::SubClassOf(owl::SubClassOf {
+                        sub_class: owl::ClassExpression::Class(sub),
+                        super_class: ctx.rel_class_expression(&qualifiers, r, cls),
+                    });
+                }
+                // Transform the class expression of a translated `intersection_of`
+                owl::Axiom::EquivalentClasses(ref v) => {
+                    if let owl::ClassExpression::ObjectIntersectionOf { o, .. } = &v.0[1] {
+                        if let owl::ClassExpression::ObjectSomeValuesFrom {
+                            o: owl::ObjectPropertyExpression::ObjectProperty(r),
+                            ce: cls,
+                        } = &o[0]
+                        {
+                            axiom.axiom = owl::Axiom::from(owl::EquivalentClasses(vec![
+                                v.0[0].clone(),
+                                owl::ClassExpression::ObjectIntersectionOf {
+                                    o: vec![ctx.rel_class_expression(
+                                        &qualifiers,
+                                        r.clone(),
+                                        cls.clone(),
+                                    )],
+                                },
+                            ]));
+                        }
+                    }
+                }
+                // No transformation needed otherwise
+                _ => (),
+            };
 
             axiom.annotation.append(&mut qualifiers.into_owl(ctx));
             Some(axiom)
