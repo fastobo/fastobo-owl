@@ -10,17 +10,24 @@
   <Declaration>
       <Class IRI="http://purl.obolibrary.org/obo/TST_02"/>
   </Declaration>
+  <Declaration>
+      <Class IRI="http://purl.obolibrary.org/obo/TST_03"/>
+  </Declaration>
 
   <AnnotationAssertion>
     <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
     <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:01</Literal>
   </AnnotationAssertion>
-
   <AnnotationAssertion>
     <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
     <AbbreviatedIRI>obo:TST_02</AbbreviatedIRI>
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:02</Literal>
+  </AnnotationAssertion>
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
+    <AbbreviatedIRI>obo:TST_03</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:03</Literal>
   </AnnotationAssertion>
 
   <EquivalentClasses>
@@ -39,6 +46,20 @@
       <ObjectSomeValuesFrom>
         <ObjectProperty abbreviatedIRI="obo:tst#part_of"/>
         <Class abbreviatedIRI="obo:TST_06"/>
+      </ObjectSomeValuesFrom>
+    </ObjectIntersectionOf>
+  </EquivalentClasses>
+
+  <EquivalentClasses>
+    <Class abbreviatedIRI="obo:TST_03"/>
+    <ObjectIntersectionOf>
+      <ObjectAllValuesFrom>
+        <ObjectProperty abbreviatedIRI="obo:tst#part_of"/>
+        <Class abbreviatedIRI="obo:TST_07"/>
+      </ObjectAllValuesFrom>
+      <ObjectSomeValuesFrom>
+        <ObjectProperty abbreviatedIRI="obo:tst#part_of"/>
+        <Class abbreviatedIRI="obo:TST_08"/>
       </ObjectSomeValuesFrom>
     </ObjectIntersectionOf>
   </EquivalentClasses>
