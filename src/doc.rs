@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use fastobo::ast as obo;
-use fastobo::ast::Identified;
-use fastobo::ext::OboSemantics;
+use fastobo::semantics::Identified;
 use horned_owl::model as owl;
 
 use super::Context;
