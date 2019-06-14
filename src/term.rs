@@ -40,7 +40,6 @@ impl IntoOwlCtx for obo::TermFrame {
         }));
 
         // Group some assertion clauses together
-        // FIXME: merge annotations as well !
         let mut intersections: Vec<owl::ClassExpression> = Vec::new();
         let mut intersections_a: BTreeSet<owl::Annotation> = BTreeSet::new();
         let mut unions: Vec<owl::ClassExpression> = Vec::new();
@@ -349,7 +348,7 @@ impl IntoOwlCtx for obo::TermClause {
                 ])))
             }
 
-            // This is handled on `Line<TermClause>::into_owl`
+            // These are handled on `Line<TermClause>::into_owl`
             obo::TermClause::Relationship(rid, cid) => Some(owl::AnnotatedAxiom::from(
                 owl::Axiom::SubClassOf(owl::SubClassOf {
                     sub_class: owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),

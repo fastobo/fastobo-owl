@@ -59,6 +59,9 @@ impl IntoOwlCtx for obo::ClassIdent {
 }
 
 /// Convert a subset identifier to an OWL IRI.
+// FIXME: this is context-dependent! The IRI replacement rule must be used
+//        if the typedef is just a local unprefixed alias for an imported
+//        typedef.
 impl IntoOwlCtx for obo::RelationIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
