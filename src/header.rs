@@ -175,10 +175,10 @@ impl IntoOwlCtx for obo::HeaderClause {
 }
 
 impl IntoOwlCtx for obo::HeaderFrame {
-    type Owl = Vec<Option<owl::AnnotatedAxiom>>;
+    type Owl = Vec<owl::AnnotatedAxiom>;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         self.into_iter()
-            .map(|clause| clause.into_owl(ctx))
+            .filter_map(|clause| clause.into_owl(ctx))
             .collect()
     }
 }

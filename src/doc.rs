@@ -8,6 +8,7 @@ use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
 use crate::constants::uri;
+use crate::imports::ImportData;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = owl::Ontology;
@@ -23,7 +24,7 @@ impl IntoOwlCtx for obo::OboDoc {
         // Convert the header frame: most frames end up as Ontology annotations,
         // but some of hem require extra axioms.
         let header = std::mem::replace(self.header_mut(), Default::default());
-        for axiom in header.into_owl(ctx).into_iter().flatten() {
+        for axiom in header.into_owl(ctx).into_iter() {
             ont.insert(axiom);
         }
 
@@ -56,16 +57,8 @@ impl IntoOwl for obo::OboDoc {
         // collision.
         self.treat_xrefs();
 
-        // Create idspace and prefix mapping with default prefixes.
-        // let mut prefixes = curie::PrefixMapping::default();
-        // prefixes.add_prefix("xsd", uri::XSD).unwrap();
-        // prefixes.add_prefix("owl", uri::OWL).unwrap();
-        // prefixes.add_prefix("obo", uri::OBO).unwrap();
-        // prefixes.add_prefix("oboInOwl", uri::OBO_IN_OWL).unwrap();
-        // prefixes.add_prefix("xml", uri::XML).unwrap();
-        // prefixes.add_prefix("rdf", uri::RDF).unwrap();
-        // prefixes.add_prefix("dc", uri::DC).unwrap();
-        // prefixes.add_prefix("rdfs", uri::RDFS).unwrap();
+        // TODO: Process the imports
+        // let data = ImportData::from(&self);
 
         // Create idspace mapping with implicit IDspaces.
         let mut idspaces = HashMap::new();
@@ -100,7 +93,7 @@ impl IntoOwl for obo::OboDoc {
         let build: horned_owl::model::Build = Default::default();
         let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.clone().into_string());
-        let class_level = Default::default(); // FIXME
+        let class_level = Default::default(); // TODO: extract annotation properties
         let mut ctx = Context {
             build,
             idspaces,
