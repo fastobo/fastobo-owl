@@ -4,20 +4,9 @@ extern crate fastobo_owl;
 extern crate horned_owl;
 
 use fastobo::ast::*;
-use fastobo_owl::constants::uri;
 use fastobo_owl::IntoOwl;
 
 fn main() {
-    let mut prefixes = curie::PrefixMapping::default();
-    prefixes.add_prefix("xsd", uri::XSD).unwrap();
-    prefixes.add_prefix("owl", uri::OWL).unwrap();
-    prefixes.add_prefix("obo", uri::OBO).unwrap();
-    prefixes.add_prefix("oboInOwl", uri::OBO_IN_OWL).unwrap();
-    prefixes.add_prefix("xml", uri::XML).unwrap();
-    prefixes.add_prefix("rdf", uri::RDF).unwrap();
-    prefixes.add_prefix("dc", uri::DC).unwrap();
-    prefixes.add_prefix("rdfs", uri::RDFS).unwrap();
-
     for arg in std::env::args().skip(1) {
         let path = std::path::PathBuf::from(arg);
 
@@ -28,6 +17,7 @@ fn main() {
         };
 
         // Convert to OWL
+        let prefixes = obodoc.prefixes();
         let owldoc = obodoc.into_owl();
 
         // Write it back

@@ -49,8 +49,17 @@ impl IntoOwlCtx for obo::OboDoc {
 }
 
 impl IntoOwl for obo::OboDoc {
-    type Owl = owl::Ontology;
-    fn into_owl(mut self) -> Self::Owl {
+    fn prefixes(&self) -> curie::PrefixMapping {
+        let mut mapping = super::obo_prefixes();
+        for clause in self.header() {
+            if let obo::HeaderClause::Idspace(prefix, url, _) = clause {
+                mapping.add_prefix(prefix.as_str(), url.as_str());
+            }
+        }
+        mapping
+    }
+
+    fn into_owl(mut self) -> owl::Ontology {
         // Process the xref header macros.
         // Assigning the default namespace is not needed since we are only
         // processing the current document, so there should be no namespace
