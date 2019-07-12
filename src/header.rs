@@ -190,9 +190,11 @@ impl IntoOwlCtx for obo::HeaderFrame {
 
         // FIXME: https://github.com/owlcollab/oboformat/issues/116
         // Parse the remaining axioms in `owl-axioms` clauses.
-        let (ont, _) = horned_functional::parse(&owl_axioms.join("\n"))
-            .expect("invalid functional ontology");
-        axioms.extend(ont);
+        if !owl_axioms.is_empty() {
+            let (ont, _) = horned_functional::parse(&owl_axioms.join("\n"))
+                .expect("invalid functional ontology");
+            axioms.extend(ont);
+        }
 
         axioms
     }
