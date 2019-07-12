@@ -21,6 +21,7 @@ status     = "actively-developed"
 [dependencies]
 fastobo = { git = "https://github.com/fastobo/fastobo" }
 horned-owl = { git = "https://github.com/phillord/horned-owl" }
+horned-functional = { git = "https://github.com/fastobo/horned-functional" }
 failure = "0.1.5"
 curie = "0.0.8"
 either = "1.5.2"

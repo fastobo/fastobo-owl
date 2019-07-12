@@ -164,8 +164,7 @@ impl IntoOwlCtx for obo::HeaderClause {
             // when creating the conversion context.
             obo::HeaderClause::Ontology(_) => None,
 
-            // should be added as-is but needs a Manchester-syntax parser
-            // obo::HeaderClause::OwlAxioms(_) => unimplemented!("cannot translate `owl-axioms` currently"),
+            // handled in the header frame translation.
             obo::HeaderClause::OwlAxioms(_) => None,
 
             // no equivalent for undefined header tag/values
@@ -177,9 +176,25 @@ impl IntoOwlCtx for obo::HeaderClause {
 impl IntoOwlCtx for obo::HeaderFrame {
     type Owl = Vec<owl::AnnotatedAxiom>;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
-        self.into_iter()
-            .filter_map(|clause| clause.into_owl(ctx))
-            .collect()
+        let mut owl_axioms: Vec<String> = Vec::new();
+        let mut axioms: Vec<owl::AnnotatedAxiom> = Vec::with_capacity(self.len());
+
+        // Process the header frame clauses
+        for clause in self.into_iter() {
+            if let obo::HeaderClause::OwlAxioms(s) = clause {
+                owl_axioms.push(s.into_string());
+            } else if let Some(axiom) = clause.into_owl(ctx) {
+                axioms.push(axiom);
+            }
+        }
+
+        // FIXME: https://github.com/owlcollab/oboformat/issues/116
+        // Parse the remaining axioms in `owl-axioms` clauses.
+        let (ont, _) = horned_functional::parse(&owl_axioms.join("\n"))
+            .expect("invalid functional ontology");
+        axioms.extend(ont);
+
+        axioms
     }
 }
 
