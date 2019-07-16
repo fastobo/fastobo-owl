@@ -52,7 +52,7 @@ impl Context {
         let c_iri: owl::IRI = cls.into_owl(self);
 
         if let Some(q) = qualifiers.iter().find(|q| q.key() == &*CARDINALITY) {
-            let n: i32 = q.value().parse().expect("invalid value for `cardinality`");
+            let n: u32 = q.value().parse().expect("invalid value for `cardinality`");
             if n == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
