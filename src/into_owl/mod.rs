@@ -1,10 +1,45 @@
+mod date;
+mod doc;
+mod header;
+mod id;
+mod pv;
+mod qualifier;
+mod strings;
+mod syn;
+mod term;
+mod xref;
+
 use std::collections::HashMap;
 use std::collections::HashSet;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
-use crate::IntoOwlCtx;
+// ---------------------------------------------------------------------------
+
+/// The internal trait for data conversion;
+///
+/// This is not exposed because `ctx` can be mostly inferred from the source
+/// OBO ontology, therefore a public trait shall be made available only for
+/// the `OboDoc` struct, with less arguments to provide.
+trait IntoOwlCtx {
+    type Owl;
+    fn into_owl(self, ctx: &mut Context) -> Self::Owl;
+}
+
+/// The public trait for context-free OBO to OWL conversion.
+pub trait IntoOwl {
+    /// Get the CURIE prefix mapping using IDSpaces declared in the document.
+    ///
+    /// This lets prefixed identifiers be shortened back again as CURIEs
+    /// in the OWL serialization. Default OBO prefixes are included (see
+    /// [`obo_prefixes`](./fn.obo_prefixes.html)).
+    fn prefixes(&self) -> curie::PrefixMapping;
+    /// Convert the OBO document into an `Ontology` in OWL language.
+    fn into_owl(self) -> owl::Ontology;
+}
+
+// ---------------------------------------------------------------------------
 
 lazy_static! {
     static ref CARDINALITY: obo::RelationIdent =

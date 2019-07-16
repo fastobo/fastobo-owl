@@ -50,7 +50,7 @@ impl IntoOwlCtx for obo::OboDoc {
 
 impl IntoOwl for obo::OboDoc {
     fn prefixes(&self) -> curie::PrefixMapping {
-        let mut mapping = super::obo_prefixes();
+        let mut mapping = crate::obo_prefixes();
         for clause in self.header() {
             if let obo::HeaderClause::Idspace(prefix, url, _) = clause {
                 mapping.add_prefix(prefix.as_str(), url.as_str());
