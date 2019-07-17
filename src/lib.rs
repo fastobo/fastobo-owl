@@ -5,6 +5,7 @@ extern crate fastobo;
 extern crate horned_owl;
 #[macro_use]
 extern crate lazy_static;
+extern crate ureq;
 
 pub mod constants;
 mod into_owl;
