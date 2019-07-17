@@ -69,47 +69,8 @@ impl IntoOwl for obo::OboDoc {
         // TODO: Process the imports
         // let data = ImportData::from(&self);
 
-        // Create idspace mapping with implicit IDspaces.
-        let mut idspaces = HashMap::new();
-        idspaces.insert(
-            obo::IdentPrefix::new("BFO"),
-            obo::Url::parse(&format!("{}BFO_", uri::OBO,)).unwrap(),
-        );
-        idspaces.insert(
-            obo::IdentPrefix::new("RO"),
-            obo::Url::parse(&format!("{}RO", uri::OBO,)).unwrap(),
-        );
-        idspaces.insert(
-            obo::IdentPrefix::new("xsd"),
-            obo::Url::parse(uri::XSD).unwrap(),
-        );
-
-        // Add the prefixes and IDspaces from the OBO header.
-        let mut ontology = None;
-        for clause in self.header() {
-            match clause {
-                obo::HeaderClause::Idspace(prefix, url, _) => {
-                    idspaces.insert(prefix.clone(), url.clone());
-                }
-                obo::HeaderClause::Ontology(id) => {
-                    ontology = Some(id.to_string());
-                }
-                _ => (),
-            }
-        }
-
-        // Create the conversion context.
-        let build: horned_owl::model::Build = Default::default();
-        let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
-        let current_frame = build.iri(ontology_iri.clone().into_string());
-        let class_level = Default::default(); // TODO: extract annotation properties
-        let mut ctx = Context {
-            build,
-            idspaces,
-            ontology_iri,
-            current_frame,
-            class_level,
-        };
+        // Extract conversion context from the document.
+        let mut ctx = Context::from(&self);
 
         // Return the converted document.
         <Self as IntoOwlCtx>::into_owl(self, &mut ctx)

@@ -15,6 +15,8 @@ use std::collections::HashSet;
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
+use crate::constants::uri;
+
 // ---------------------------------------------------------------------------
 
 /// The internal trait for data conversion;
@@ -22,7 +24,7 @@ use horned_owl::model as owl;
 /// This is not exposed because `ctx` can be mostly inferred from the source
 /// OBO ontology, therefore a public trait shall be made available only for
 /// the `OboDoc` struct, with less arguments to provide.
-trait IntoOwlCtx {
+pub trait IntoOwlCtx {
     type Owl;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl;
 }
@@ -34,6 +36,8 @@ pub trait IntoOwl {
     /// This lets prefixed identifiers be shortened back again as CURIEs
     /// in the OWL serialization. Default OBO prefixes are included (see
     /// [`obo_prefixes`](./fn.obo_prefixes.html)).
+    ///
+    /// See also: [`horned_owl::io::writer::write`](https://docs.rs/horned-owl/latest/horned_owl/io/writer/fn.write.html).
     fn prefixes(&self) -> curie::PrefixMapping;
     /// Convert the OBO document into an `Ontology` in OWL language.
     fn into_owl(self) -> owl::Ontology;
@@ -205,6 +209,52 @@ impl Context {
                 o: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
                 ce: Box::new(owl::ClassExpression::Class(owl::Class(c_iri))),
             }
+        }
+    }
+}
+
+impl From<&obo::OboDoc> for Context {
+    fn from(doc: &obo::OboDoc) -> Self {
+        let mut idspaces = HashMap::new();
+        idspaces.insert(
+            obo::IdentPrefix::new("BFO"),
+            obo::Url::parse(&format!("{}BFO_", uri::OBO,)).unwrap(),
+        );
+        idspaces.insert(
+            obo::IdentPrefix::new("RO"),
+            obo::Url::parse(&format!("{}RO", uri::OBO,)).unwrap(),
+        );
+        idspaces.insert(
+            obo::IdentPrefix::new("xsd"),
+            obo::Url::parse(uri::XSD).unwrap(),
+        );
+
+        // Add the prefixes and IDspaces from the OBO header.
+        let mut ontology = None;
+        for clause in doc.header() {
+            match clause {
+                obo::HeaderClause::Idspace(prefix, url, _) => {
+                    idspaces.insert(prefix.clone(), url.clone());
+                }
+                obo::HeaderClause::Ontology(id) => {
+                    ontology = Some(id.to_string());
+                }
+                _ => (),
+            }
+        }
+
+        // Create the conversion context.
+        let build: horned_owl::model::Build = Default::default();
+        let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
+        let current_frame = build.iri(ontology_iri.clone().into_string());
+        let class_level = Default::default(); // TODO: extract annotation properties
+
+        Context {
+            build,
+            idspaces,
+            ontology_iri,
+            current_frame,
+            class_level,
         }
     }
 }
