@@ -7,6 +7,7 @@ mod qualifier;
 mod strings;
 mod syn;
 mod term;
+mod typedef;
 mod xref;
 
 use std::collections::HashMap;
@@ -69,11 +70,13 @@ pub struct Context {
     pub ontology_iri: obo::Url,
 
     pub current_frame: owl::IRI,
+    pub in_annotation: bool,
 
     /// A set of IRI which refer to class level annotation relationships.
     ///
     /// This is likely to require processing imports beforehand.
     pub class_level: HashSet<owl::IRI>,
+
 }
 
 impl Context {
@@ -255,6 +258,7 @@ impl From<&obo::OboDoc> for Context {
             ontology_iri,
             current_frame,
             class_level,
+            in_annotation: false,
         }
     }
 }

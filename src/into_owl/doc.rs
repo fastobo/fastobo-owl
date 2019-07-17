@@ -40,6 +40,11 @@ impl IntoOwlCtx for obo::OboDoc {
                         ont.insert(axiom);
                     }
                 }
+                obo::EntityFrame::Typedef(frame) => {
+                    for axiom in frame.into_owl(ctx) {
+                        ont.insert(axiom);
+                    }
+                }
                 // _ => unimplemented!(),
                 _ => (),
             };
