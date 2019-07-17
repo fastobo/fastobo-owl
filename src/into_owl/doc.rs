@@ -9,6 +9,8 @@ use super::IntoOwl;
 use super::IntoOwlCtx;
 use crate::constants::uri;
 use crate::imports::ImportData;
+use crate::imports::ImportProvider;
+use crate::imports::FoundryProvider;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = owl::Ontology;
@@ -66,11 +68,17 @@ impl IntoOwl for obo::OboDoc {
         // collision.
         self.treat_xrefs();
 
-        // TODO: Process the imports
-        // let data = ImportData::from(&self);
-
         // Extract conversion context from the document.
         let mut ctx = Context::from(&self);
+
+        // Extract the data needed for conversion from the imports.
+        let mut provider = FoundryProvider::default();
+        for clause in self.header() {
+            if let obo::HeaderClause::Import(i) = clause {
+                let data = provider.import(i).unwrap(); // FIXME: chain error
+                ctx.class_level.extend(data.annotation_properties);
+            }
+        }
 
         // Return the converted document.
         <Self as IntoOwlCtx>::into_owl(self, &mut ctx)

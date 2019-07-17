@@ -8,22 +8,24 @@ use horned_owl::model as owl;
 
 use super::into_owl::IntoOwlCtx;
 use super::into_owl::Context;
+use super::utils::hashset_take_arbitrary;
 
 // ---------------------------------------------------------------------------
 
 pub trait ImportProvider {
-    fn import(import: obo::Import) -> Result<ImportData, String>;
+    fn import(&mut self, import: &obo::Import) -> Result<ImportData, String>;
 }
 
 // ---------------------------------------------------------------------------
 
-pub struct FoundryProvider;
+#[derive(Debug, Default)]
+pub struct FoundryProvider {}
 
 impl ImportProvider for FoundryProvider {
-    fn import(import: obo::Import) -> Result<ImportData, String> {
-        //
+    fn import(&mut self, import: &obo::Import) -> Result<ImportData, String> {
+        // use URL or use default OBO Foundry URL
         let url = match import {
-            obo::Import::Url(url) => url,
+            obo::Import::Url(url) => url.clone(),
             obo::Import::Abbreviated(id) => {
                 let s = format!("http://purl.obolibrary.org/obo/{}.obo", id);
                 obo::Url::parse(&s).expect("invalid import")
@@ -35,7 +37,7 @@ impl ImportProvider for FoundryProvider {
         let mut buf = BufReader::new(res.into_reader());
 
         // parse the OBO file if it is a correct OBO file.
-        let data = match Path::new(url.path()).extension() {
+        let mut data = match Path::new(url.path()).extension() {
             Some(x) if x == "obo" => {
                 let mut doc = fastobo::ast::OboDoc::from_stream(&mut buf)
                     .expect("could not parse OBO document");
@@ -49,6 +51,15 @@ impl ImportProvider for FoundryProvider {
                 panic!("unknown import extension: {:?}", other);
             }
         };
+
+        // process all imports
+        let mut imports = data.imports.clone();
+        while let Some(i) = hashset_take_arbitrary(&mut imports) {
+            // import the import in the document and add them to the `ImportData`.
+            let import_data = self.import(&i)?;
+            data.imports.extend(import_data.imports);
+            data.annotation_properties.extend(import_data.annotation_properties);
+        }
 
         Ok(data)
     }

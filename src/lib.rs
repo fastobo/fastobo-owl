@@ -10,6 +10,7 @@ extern crate ureq;
 pub mod constants;
 mod into_owl;
 mod imports;
+mod utils;
 
 pub use into_owl::IntoOwl;
 pub use imports::ImportData;
