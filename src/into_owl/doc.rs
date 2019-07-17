@@ -71,14 +71,15 @@ impl IntoOwl for obo::OboDoc {
         // Extract conversion context from the document.
         let mut ctx = Context::from(&self);
 
-        // Extract the data needed for conversion from the imports.
-        let mut provider = FoundryProvider::default();
-        for clause in self.header() {
-            if let obo::HeaderClause::Import(i) = clause {
-                let data = provider.import(i).unwrap(); // FIXME: chain error
-                ctx.class_level.extend(data.annotation_properties);
-            }
-        }
+        // TODO
+        // // Extract the data needed for conversion from the imports.
+        // let mut provider = FoundryProvider::default();
+        // for clause in self.header() {
+        //     if let obo::HeaderClause::Import(i) = clause {
+        //         let data = provider.import(i).unwrap(); // FIXME: chain error
+        //         ctx.class_level.extend(data.annotation_properties);
+        //     }
+        // }
 
         // Return the converted document.
         <Self as IntoOwlCtx>::into_owl(self, &mut ctx)
