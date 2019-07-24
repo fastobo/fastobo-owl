@@ -25,6 +25,9 @@ script:
 after_script:
 - curl -SsL "https://codecov.io/bash" | bash
 
+before_cache:
+- cargo cache -a
+
 deploy:
 - provider: cargo
   token:
