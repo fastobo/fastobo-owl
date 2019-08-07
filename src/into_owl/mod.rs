@@ -61,25 +61,35 @@ lazy_static! {
 
 /// An opaque structure to pass context arguments required for OWL conversion.
 pub struct Context {
-    ///
+    /// The `horned_owl::model::Build` to create reference counted IRI.
     pub build: owl::Build,
 
-    // prefixes: curie::PrefixMapping,
+    /// A mapping of the declared OBO ID spaces to their respective URL bases.
     pub idspaces: HashMap<obo::IdentPrefix, obo::Url>,
 
+    /// The IRI of the ontology currently being processed.
     pub ontology_iri: obo::Url,
 
+    /// The IRI of the frame currently being processed.
     pub current_frame: owl::IRI,
+
+    /// A flag to indicate the current frame is an annotation property.
     pub in_annotation: bool,
+
+    /// A mapping
+    pub shorthands: HashMap<UnprefixedIdent, Ident>,
 
     /// A set of IRI which refer to class level annotation relationships.
     ///
     /// This is likely to require processing imports beforehand.
     pub class_level: HashSet<owl::IRI>,
-
 }
 
 impl Context {
+    pub fn find_shorthand(frame: TypedefFrame) -> Option<Ident> {
+
+    }
+
     pub fn is_class_level(&mut self, rid: &owl::IRI) -> bool {
         self.class_level.contains(&rid)
     }
@@ -218,6 +228,7 @@ impl Context {
 
 impl From<&obo::OboDoc> for Context {
     fn from(doc: &obo::OboDoc) -> Self {
+        /// Add the ID spaces declared implicitly in the document.
         let mut idspaces = HashMap::new();
         idspaces.insert(
             obo::IdentPrefix::new("BFO"),
@@ -232,7 +243,7 @@ impl From<&obo::OboDoc> for Context {
             obo::Url::parse(uri::XSD).unwrap(),
         );
 
-        // Add the prefixes and IDspaces from the OBO header.
+        // Add the prefixes and ID spaces from the OBO header.
         let mut ontology = None;
         for clause in doc.header() {
             match clause {
@@ -243,6 +254,19 @@ impl From<&obo::OboDoc> for Context {
                     ontology = Some(id.to_string());
                 }
                 _ => (),
+            }
+        }
+
+        // Add the shorthands from the OBO typdef
+        let mut shorthands = HashMap::new();
+        for frame in doc {
+            if let EntityFrame::Typedef(typedef) = frame {
+                let id = typedef.id().as_ref().as_ref();
+                if let Ident::Unprefixed(unprefixed) = id {
+                    if let Some(short) = Context::find_shorthand(typedef) {
+                        shorthands.insert(id.clone(), short.clone());
+                    }
+                }
             }
         }
 

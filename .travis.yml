@@ -19,7 +19,6 @@ install:
 - ci/travis/install.sh
 
 script:
-- cargo test # Required until `cargo-tarpaulin` stops exiting with 0 on failed tests
 - cargo tarpaulin -v --out Xml --ciserver travis-ci
 
 after_script:
