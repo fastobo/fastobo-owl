@@ -77,7 +77,7 @@ pub struct Context {
     pub in_annotation: bool,
 
     /// A mapping
-    pub shorthands: HashMap<UnprefixedIdent, Ident>,
+    pub shorthands: HashMap<obo::UnprefixedIdent, obo::Ident>,
 
     /// A set of IRI which refer to class level annotation relationships.
     ///
@@ -86,8 +86,8 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn find_shorthand(frame: TypedefFrame) -> Option<Ident> {
-
+    pub fn find_shorthand(frame: &obo::TypedefFrame) -> Option<obo::Ident> {
+        None
     }
 
     pub fn is_class_level(&mut self, rid: &owl::IRI) -> bool {
@@ -259,10 +259,10 @@ impl From<&obo::OboDoc> for Context {
 
         // Add the shorthands from the OBO typdef
         let mut shorthands = HashMap::new();
-        for frame in doc {
-            if let EntityFrame::Typedef(typedef) = frame {
+        for frame in doc.entities() {
+            if let obo::EntityFrame::Typedef(typedef) = frame {
                 let id = typedef.id().as_ref().as_ref();
-                if let Ident::Unprefixed(unprefixed) = id {
+                if let obo::Ident::Unprefixed(unprefixed) = id {
                     if let Some(short) = Context::find_shorthand(typedef) {
                         shorthands.insert(id.clone(), short.clone());
                     }
@@ -275,6 +275,7 @@ impl From<&obo::OboDoc> for Context {
         let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.clone().into_string());
         let class_level = Default::default(); // TODO: extract annotation properties
+        let shorthands = Default::default(); // TODO: extract shorthands
 
         Context {
             build,
@@ -282,6 +283,7 @@ impl From<&obo::OboDoc> for Context {
             ontology_iri,
             current_frame,
             class_level,
+            shorthands,
             in_annotation: false,
         }
     }
