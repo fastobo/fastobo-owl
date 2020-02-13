@@ -19,9 +19,9 @@ repository = "fastobo/fastobo-owl"
 status     = "actively-developed"
 
 [dependencies]
-fastobo = { git = "https://github.com/fastobo/fastobo" }
-horned-owl = { git = "https://github.com/phillord/horned-owl" }
-horned-functional = { git = "https://github.com/fastobo/horned-functional" }
+fastobo = "0.8.2"
+horned-owl = "0.6.0"
+horned-functional = "0.1.0"
 failure = "0.1.5"
 curie = "0.0.8"
 either = "1.5.2"

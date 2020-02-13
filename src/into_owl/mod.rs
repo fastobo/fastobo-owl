@@ -107,16 +107,16 @@ impl Context {
             let n: u32 = q.value().parse().expect("invalid value for `cardinality`");
             if n == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
-                    o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                    ce: Box::new(owl::ClassExpression::ObjectComplementOf {
-                        ce: Box::new(owl::Class(c_iri).into()),
-                    }),
+                    ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
+                    bce: Box::new(owl::ClassExpression::ObjectComplementOf(
+                        Box::new(owl::Class(c_iri).into()),
+                    )),
                 };
             } else {
                 return owl::ClassExpression::ObjectExactCardinality {
                     n,
-                    o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                    ce: Box::new(owl::Class(c_iri).into()),
+                    ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
+                    bce: Box::new(owl::Class(c_iri).into()),
                 };
             }
         }
@@ -128,10 +128,10 @@ impl Context {
                 .expect("invalid value for `maxCardinality`");
             if na == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
-                    o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                    ce: Box::new(owl::ClassExpression::ObjectComplementOf {
-                        ce: Box::new(owl::Class(c_iri).into()),
-                    }),
+                    ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
+                    bce: Box::new(owl::ClassExpression::ObjectComplementOf(
+                        Box::new(owl::Class(c_iri).into()),
+                    )),
                 };
             }
         }
@@ -145,30 +145,30 @@ impl Context {
                 let nb = qb
                     .value()
                     .parse()
-                    .expect("invalid value for `max_cardinality`");;
-                return owl::ClassExpression::ObjectIntersectionOf {
-                    o: vec![
+                    .expect("invalid value for `max_cardinality`");
+                return owl::ClassExpression::ObjectIntersectionOf(
+                    vec![
                         owl::ClassExpression::ObjectMinCardinality {
                             n: na,
-                            o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
                                 r_iri.clone(),
                             )),
-                            ce: Box::new(owl::Class(c_iri.clone()).into()),
+                            bce: Box::new(owl::Class(c_iri.clone()).into()),
                         },
                         owl::ClassExpression::ObjectMaxCardinality {
                             n: nb,
-                            o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
                                 r_iri.clone(),
                             )),
-                            ce: Box::new(owl::Class(c_iri.clone()).into()),
+                            bce: Box::new(owl::Class(c_iri.clone()).into()),
                         },
                     ],
-                };
+                );
             } else {
                 return owl::ClassExpression::ObjectMinCardinality {
                     n: na,
-                    o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                    ce: Box::new(owl::Class(c_iri).into()),
+                    ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
+                    bce: Box::new(owl::Class(c_iri).into()),
                 };
             }
         }
@@ -178,35 +178,35 @@ impl Context {
                 n: q.value()
                     .parse()
                     .expect("invalid value for `maxCardinality`"),
-                o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                ce: Box::new(owl::ClassExpression::ObjectComplementOf {
-                    ce: Box::new(owl::Class(c_iri).into()),
-                }),
+                ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
+                bce: Box::new(owl::ClassExpression::ObjectComplementOf(
+                    Box::new(owl::Class(c_iri).into()),
+                )),
             };
         }
 
         if let Some(q_only) = qualifiers.iter().find(|q| q.key() == &*ALL_ONLY) {
             if let Some(q_some) = qualifiers.iter().find(|q| q.key() == &*ALL_SOME) {
-                return owl::ClassExpression::ObjectIntersectionOf {
-                    o: vec![
+                return owl::ClassExpression::ObjectIntersectionOf(
+                    vec![
                         owl::ClassExpression::ObjectSomeValuesFrom {
-                            o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
                                 r_iri.clone(),
                             )),
-                            ce: Box::new(owl::Class(c_iri.clone()).into()),
+                            bce: Box::new(owl::Class(c_iri.clone()).into()),
                         },
                         owl::ClassExpression::ObjectAllValuesFrom {
-                            o: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
                                 r_iri,
                             )),
-                            ce: Box::new(owl::Class(c_iri).into()),
+                            bce: Box::new(owl::Class(c_iri).into()),
                         },
                     ],
-                };
+                );
             } else {
                 return owl::ClassExpression::ObjectAllValuesFrom {
-                    o: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
-                    ce: Box::new(owl::Class(c_iri).into()),
+                    ope: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
+                    bce: Box::new(owl::Class(c_iri).into()),
                 };
             }
         }
@@ -214,13 +214,13 @@ impl Context {
         // FIXME: is_class_level
         if self.is_class_level(&r_iri) {
             owl::ClassExpression::ObjectHasValue {
-                o: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
+                ope: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
                 i: owl::NamedIndividual::from(c_iri),
             }
         } else {
             owl::ClassExpression::ObjectSomeValuesFrom {
-                o: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
-                ce: Box::new(owl::ClassExpression::Class(owl::Class(c_iri))),
+                ope: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
+                bce: Box::new(owl::ClassExpression::Class(owl::Class(c_iri))),
             }
         }
     }
@@ -228,7 +228,7 @@ impl Context {
 
 impl From<&obo::OboDoc> for Context {
     fn from(doc: &obo::OboDoc) -> Self {
-        /// Add the ID spaces declared implicitly in the document.
+        // Add the ID spaces declared implicitly in the document.
         let mut idspaces = HashMap::new();
         idspaces.insert(
             obo::IdentPrefix::new("BFO"),

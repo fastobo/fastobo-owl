@@ -26,7 +26,7 @@ macro_rules! converttest {
             let output_path = dir.join(format!("{}.output.owl", stringify!($name)));
 
             // Parse the OBO doc and convert it to OWL.
-            let obo_doc = OboDoc::from_file(&input_path).expect("could not parse input file");
+            let obo_doc = fastobo::from_file(&input_path).expect("could not parse input file");
             let actual = obo_doc.into_owl();
 
             // horned_owl::io::writer::write(&mut std::io::stdout(), &actual, Some(&PREFIXES));

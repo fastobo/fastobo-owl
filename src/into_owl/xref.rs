@@ -15,10 +15,10 @@ impl IntoOwlCtx for obo::Xref {
     type Owl = owl::Annotation;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         owl::Annotation {
-            annotation_property: ctx
+            ap: ctx
                 .build
                 .annotation_property(property::obo_in_owl::HAS_DBXREF),
-            annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+            av: owl::AnnotationValue::Literal(owl::Literal {
                 lang: None,
                 datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                 literal: Some(self.id().to_string()),

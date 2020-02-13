@@ -33,8 +33,8 @@ impl IntoOwlCtx for obo::Qualifier {
             let value = std::mem::replace(self.value_mut(), obo::QuotedString::new(String::new()));
             // Build the annotation.
             Some(owl::Annotation {
-                annotation_property: key.into_owl(ctx).into(),
-                annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+                ap: key.into_owl(ctx).into(),
+                av: owl::AnnotationValue::Literal(owl::Literal {
                     lang: None,
                     datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                     literal: Some(value.into_string()),

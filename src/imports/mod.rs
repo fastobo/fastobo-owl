@@ -39,16 +39,16 @@ impl ImportProvider for FoundryProvider {
         // parse the OBO file if it is a correct OBO file.
         let mut data = match Path::new(url.path()).extension() {
             Some(x) if x == "obo" => {
-                let mut doc = fastobo::ast::OboDoc::from_stream(&mut buf)
+                let mut doc = fastobo::from_reader(&mut buf)
                     .expect("could not parse OBO document");
                 doc.treat_xrefs();
                 ImportData::from(doc)
             }
             Some(x) if x == "owl" => {
-                unimplemented!("import OWL");
+                return Err(String::from("cannot import OWL now"));
             }
             other => {
-                panic!("unknown import extension: {:?}", other);
+                return Err(format!("unknown import extension: {:?}", other));
             }
         };
 

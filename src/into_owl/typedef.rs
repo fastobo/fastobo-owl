@@ -27,14 +27,14 @@ impl IntoOwlCtx for obo::TypedefFrame {
         if is_annotation_property(&self) {
             // Annotation property.
             axioms.insert(owl::AnnotatedAxiom {
-                annotation: BTreeSet::new(),
+                ann: BTreeSet::new(),
                 axiom: owl::Axiom::from(owl::DeclareAnnotationProperty(id.clone().into())),
             });
             ctx.in_annotation = true;
         } else {
             // Object property.
             axioms.insert(owl::AnnotatedAxiom {
-                annotation: BTreeSet::new(),
+                ann: BTreeSet::new(),
                 axiom: owl::Axiom::from(owl::DeclareObjectProperty(id.clone().into())),
             });
             ctx.in_annotation = false;
@@ -42,10 +42,10 @@ impl IntoOwlCtx for obo::TypedefFrame {
 
         // Add the original OBO ID as an annotation.
         axioms.insert(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-            annotation_subject: id.clone(),
-            annotation: owl::Annotation {
-                annotation_property: ctx.build.annotation_property(property::obo_in_owl::ID),
-                annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+            subject: id.clone(),
+            ann: owl::Annotation {
+                ap: ctx.build.annotation_property(property::obo_in_owl::ID),
+                av: owl::AnnotationValue::Literal(owl::Literal {
                     datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                     literal: Some(self.id().as_ref().to_string()),
                     lang: None,
@@ -80,21 +80,21 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::IsAnonymous(_) => None,
             obo::TypedefClause::Name(name) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(property::rdfs::LABEL),
-                        annotation_value: name.into_owl(ctx).into(),
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx.build.annotation_property(property::rdfs::LABEL),
+                        av: name.into_owl(ctx).into(),
                     },
                 }))
             },
             obo::TypedefClause::Namespace(ns) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx
                             .build
                             .annotation_property(property::obo_in_owl::HAS_OBO_NAMESPACE),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+                        av: owl::AnnotationValue::Literal(owl::Literal {
                             datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(ns.to_string()),
                             lang: None,
@@ -104,12 +104,12 @@ impl IntoOwlCtx for obo::TypedefClause {
             },
             obo::TypedefClause::AltId(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx
                             .build
                             .annotation_property(property::obo_in_owl::HAS_ALTERNATIVE_ID),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+                        av: owl::AnnotationValue::Literal(owl::Literal {
                             datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
                             literal: Some(id.to_string()),
                             lang: None,
@@ -122,10 +122,10 @@ impl IntoOwlCtx for obo::TypedefClause {
                     owl::AnnotationAssertion::new(
                         ctx.current_frame.clone(),
                         owl::Annotation {
-                            annotation_property: ctx
+                            ap: ctx
                                 .build
                                 .annotation_property(property::iao::DEFINITION),
-                            annotation_value: desc.into_owl(ctx).into(),
+                            av: desc.into_owl(ctx).into(),
                         },
                     ),
                     xrefs.into_owl(ctx),
@@ -133,42 +133,42 @@ impl IntoOwlCtx for obo::TypedefClause {
             },
             obo::TypedefClause::Comment(comment) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(property::rdfs::COMMENT),
-                        annotation_value: comment.into_owl(ctx).into(),
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx.build.annotation_property(property::rdfs::COMMENT),
+                        av: comment.into_owl(ctx).into(),
                     },
                 }))
             },
             obo::TypedefClause::Subset(subset) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx
                             .build
                             .annotation_property(property::obo_in_owl::IN_SUBSET),
-                        annotation_value: owl::AnnotationValue::IRI(subset.into_owl(ctx)),
+                        av: owl::AnnotationValue::IRI(subset.into_owl(ctx)),
                     },
                 }))
             },
             obo::TypedefClause::Synonym(syn) => Some(syn.into_owl(ctx)),
             obo::TypedefClause::Xref(xref) => {
                 let annotation = xref.description().map(|desc| owl::Annotation {
-                    annotation_property: ctx.build.annotation_property(property::rdfs::LABEL),
-                    annotation_value: desc.clone().into_owl(ctx).into(),
+                    ap: ctx.build.annotation_property(property::rdfs::LABEL),
+                    av: desc.clone().into_owl(ctx).into(),
                 });
                 Some(owl::AnnotatedAxiom::new(
                    owl::Axiom::from(owl::AnnotationAssertion {
-                       annotation_subject: ctx.current_frame.clone(),
-                       annotation: xref.into_owl(ctx),
+                       subject: ctx.current_frame.clone(),
+                       ann: xref.into_owl(ctx),
                    }),
                    BTreeSet::from_iter(annotation),
                ))
             },
             obo::TypedefClause::PropertyValue(pv) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: pv.into_owl(ctx),
+                    subject: ctx.current_frame.clone(),
+                    ann: pv.into_owl(ctx),
                 }))
             },
             // obo::TypedefClause::Domain(ClassIdent),
@@ -186,15 +186,15 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::IsA(supercls) => {
                 Some(if ctx.in_annotation {
                     owl::AnnotatedAxiom::from(owl::SubAnnotationPropertyOf {
-                        super_property: supercls.into_owl(ctx).into(),
-                        sub_property: ctx.current_frame.clone().into(),
+                        sup: supercls.into_owl(ctx).into(),
+                        sub: ctx.current_frame.clone().into(),
                     })
                 } else {
                     owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
-                        super_property: owl::ObjectPropertyExpression::ObjectProperty(
+                        sup: owl::ObjectPropertyExpression::ObjectProperty(
                             supercls.into_owl(ctx).into()
                         ),
-                        sub_property: owl::SubObjectPropertyExpression::ObjectPropertyExpression(
+                        sub: owl::SubObjectPropertyExpression::ObjectPropertyExpression(
                             owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into())
                         ),
                     })
@@ -211,12 +211,12 @@ impl IntoOwlCtx for obo::TypedefClause {
             // obo::TypedefClause::Relationship(RelationIdent, RelationIdent),
             obo::TypedefClause::IsObsolete(b) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx
                             .build
                             .annotation_property(property::owl::DEPRECATED),
-                        annotation_value: owl::AnnotationValue::Literal(owl::Literal {
+                        av: owl::AnnotationValue::Literal(owl::Literal {
                             datatype_iri: Some(ctx.build.iri(datatype::xsd::BOOLEAN)),
                             literal: Some(b.to_string()),
                             lang: None,
@@ -226,41 +226,41 @@ impl IntoOwlCtx for obo::TypedefClause {
             },
             obo::TypedefClause::ReplacedBy(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx
                             .build
                             .annotation_property(property::iao::REPLACED_BY),
-                        annotation_value: owl::AnnotationValue::IRI(id.into_owl(ctx)),
+                        av: owl::AnnotationValue::IRI(id.into_owl(ctx)),
                     },
                 }))
             }
             obo::TypedefClause::Consider(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx
                             .build
                             .annotation_property(property::obo_in_owl::CONSIDER),
-                        annotation_value: owl::AnnotationValue::IRI(id.into_owl(ctx)),
+                        av: owl::AnnotationValue::IRI(id.into_owl(ctx)),
                     },
                 }))
             }
             obo::TypedefClause::CreatedBy(c) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(property::dc::CREATOR),
-                        annotation_value: c.into_owl(ctx).into(),
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx.build.annotation_property(property::dc::CREATOR),
+                        av: c.into_owl(ctx).into(),
                     },
                 }))
             },
             obo::TypedefClause::CreationDate(dt) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    annotation_subject: ctx.current_frame.clone(),
-                    annotation: owl::Annotation {
-                        annotation_property: ctx.build.annotation_property(property::dc::DATE),
-                        annotation_value: dt.into_owl(ctx).into(),
+                    subject: ctx.current_frame.clone(),
+                    ann: owl::Annotation {
+                        ap: ctx.build.annotation_property(property::dc::DATE),
+                        av: dt.into_owl(ctx).into(),
                     },
                 }))
             },

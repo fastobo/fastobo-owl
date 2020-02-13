@@ -1,12 +1,8 @@
-use std::collections::BTreeSet;
-use std::iter::FromIterator;
-
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
 use super::Context;
 use super::IntoOwlCtx;
-use crate::constants::datatype;
 use crate::constants::property;
 
 impl IntoOwlCtx for obo::Synonym {
@@ -27,10 +23,10 @@ impl IntoOwlCtx for obo::Synonym {
         );
 
         let axiom = owl::AnnotationAssertion {
-            annotation_subject: ctx.current_frame.clone(),
-            annotation: owl::Annotation {
-                annotation_property: ctx.build.annotation_property(uri),
-                annotation_value: d.into_owl(ctx).into(),
+            subject: ctx.current_frame.clone(),
+            ann: owl::Annotation {
+                ap: ctx.build.annotation_property(uri),
+                av: d.into_owl(ctx).into(),
             },
         };
 
@@ -38,10 +34,10 @@ impl IntoOwlCtx for obo::Synonym {
             std::mem::replace(self.xrefs_mut(), obo::XrefList::default()).into_owl(ctx);
         if let Some(ty) = self.ty() {
             annotations.insert(owl::Annotation {
-                annotation_property: ctx
+                ap: ctx
                     .build
                     .annotation_property(property::obo_in_owl::HAS_SYNONYM_TYPE),
-                annotation_value: owl::AnnotationValue::IRI(
+                av: owl::AnnotationValue::IRI(
                     obo::Ident::from(ty.clone()).into_owl(ctx),
                 ),
             });

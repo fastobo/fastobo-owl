@@ -3,7 +3,6 @@ extern crate fastobo;
 extern crate fastobo_owl;
 extern crate horned_owl;
 
-use fastobo::ast::*;
 use fastobo_owl::IntoOwl;
 
 fn main() {
@@ -11,7 +10,7 @@ fn main() {
         let path = std::path::PathBuf::from(arg);
 
         // Parse the document
-        let obodoc = match OboDoc::from_file(&path) {
+        let obodoc = match fastobo::from_file(&path) {
             Ok(doc) => doc,
             Err(e) => panic!("{:?} could not be parsed:\n{}", path, e),
         };

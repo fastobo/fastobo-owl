@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
 use horned_owl::model as owl;
@@ -7,10 +5,6 @@ use horned_owl::model as owl;
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
-use crate::constants::uri;
-use crate::imports::ImportData;
-use crate::imports::ImportProvider;
-use crate::imports::FoundryProvider;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = owl::Ontology;
