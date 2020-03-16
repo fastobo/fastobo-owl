@@ -26,7 +26,7 @@ failure = "0.1.5"
 curie = "0.0.8"
 either = "1.5.2"
 lazy_static = "1.3.0"
-ureq = "0.11"
+ureq = "0.12"
 
 [dev-dependencies]
 curie = "0.0.8"
