@@ -1,5 +1,4 @@
-sudo: false
-dist: xenial
+dist: bionic
 language: Rust
 rust:
 - stable
@@ -7,9 +6,8 @@ rust:
 - nightly
 
 cache:
-  cargo: true
   directories:
-  - "$HOME/.cargo/bin"
+  - $TRAVIS_BUILD_DIR/target
 
 env:
   global:
