@@ -20,7 +20,7 @@ status     = "actively-developed"
 
 [dependencies]
 fastobo = "0.9.0"
-horned-owl = "0.6.0"
+horned-owl = "0.9.0"
 horned-functional = "0.1.2"
 failure = "0.1.5"
 curie = "0.0.8"
