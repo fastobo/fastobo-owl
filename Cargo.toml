@@ -28,7 +28,7 @@ version = "0.13.0"
 default-features = false
 
 [dev-dependencies]
-pretty_assertions = "0.6.1"
+pretty_assertions = "1.0.0"
 
 [[bin]]
 name = "fastobo2owl"
