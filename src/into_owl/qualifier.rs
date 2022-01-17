@@ -9,13 +9,27 @@ use super::IntoOwlCtx;
 lazy_static! {
     static ref EXCLUDED: BTreeSet<obo::RelationIdent> = {
         let mut s = BTreeSet::new();
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("cardinality")));
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("minCardinality")));
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("maxCardinality")));
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("gci_relation")));
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("gci_filler")));
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("all_some")));
-        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new("all_only")));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "cardinality",
+        )));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "minCardinality",
+        )));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "maxCardinality",
+        )));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "gci_relation",
+        )));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "gci_filler",
+        )));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "all_some",
+        )));
+        s.insert(obo::RelationIdent::from(obo::UnprefixedIdent::new(
+            "all_only",
+        )));
         s
     };
 }

@@ -37,9 +37,7 @@ impl IntoOwlCtx for obo::Synonym {
                 ap: ctx
                     .build
                     .annotation_property(property::obo_in_owl::HAS_SYNONYM_TYPE),
-                av: owl::AnnotationValue::IRI(
-                    obo::Ident::from(ty.clone()).into_owl(ctx),
-                ),
+                av: owl::AnnotationValue::IRI(obo::Ident::from(ty.clone()).into_owl(ctx)),
             });
         }
 

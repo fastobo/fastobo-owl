@@ -107,9 +107,11 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
             obo::TermClause::IntersectionOf(Some(rid), cid) => Some(owl::AnnotatedAxiom::new(
                 owl::Axiom::EquivalentClasses(owl::EquivalentClasses(vec![
                     owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
-                    owl::ClassExpression::ObjectIntersectionOf(
-                        vec![ctx.rel_class_expression(&qualifiers, *rid, *cid)]
-                    ),
+                    owl::ClassExpression::ObjectIntersectionOf(vec![ctx.rel_class_expression(
+                        &qualifiers,
+                        *rid,
+                        *cid,
+                    )]),
                 ])),
                 qualifiers.into_owl(ctx),
             )),
@@ -117,21 +119,19 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
             obo::TermClause::Relationship(rid, cid) => {
                 let r_iri = rid.clone().into_owl(ctx);
                 if ctx.is_metadata_tag(&r_iri) {
-                    Some(owl::AnnotatedAxiom::from(
-                      owl::AnnotationAssertion {
-                          subject: owl::Individual::Named(owl::NamedIndividual::from(&ctx.current_frame)),
-                          ann: owl::Annotation {
-                              ap: owl::AnnotationProperty::from(r_iri),
-                              av: owl::AnnotationValue::from(cid.clone().into_owl(ctx)),
-                          }
-                      }
-                  ))
+                    Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                        subject: owl::Individual::Named(owl::NamedIndividual::from(
+                            &ctx.current_frame,
+                        )),
+                        ann: owl::Annotation {
+                            ap: owl::AnnotationProperty::from(r_iri),
+                            av: owl::AnnotationValue::from(cid.clone().into_owl(ctx)),
+                        },
+                    }))
                 } else {
                     Some(owl::AnnotatedAxiom::new(
                         owl::Axiom::SubClassOf(owl::SubClassOf {
-                            sub: owl::ClassExpression::from(owl::Class(
-                                ctx.current_frame.clone(),
-                            )),
+                            sub: owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
                             sup: ctx.rel_class_expression(&qualifiers, *rid, *cid),
                         }),
                         qualifiers.into_owl(ctx),
@@ -199,9 +199,7 @@ impl IntoOwlCtx for obo::TermClause {
                 }))
             }
 
-            obo::TermClause::Def(def) => {
-                Some(def.into_owl(ctx))
-            },
+            obo::TermClause::Def(def) => Some(def.into_owl(ctx)),
 
             obo::TermClause::Comment(comment) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
@@ -267,12 +265,10 @@ impl IntoOwlCtx for obo::TermClause {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     subject: owl::Individual::from(&ctx.current_frame),
                     ann: owl::Annotation {
-                        ap: ctx
-                            .build
-                            .annotation_property(property::owl::DEPRECATED),
+                        ap: ctx.build.annotation_property(property::owl::DEPRECATED),
                         av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
                             datatype_iri: ctx.build.iri(datatype::xsd::BOOLEAN),
-                            literal:b.to_string(),
+                            literal: b.to_string(),
                         }),
                     },
                 }))
@@ -282,9 +278,7 @@ impl IntoOwlCtx for obo::TermClause {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                     subject: owl::Individual::from(&ctx.current_frame),
                     ann: owl::Annotation {
-                        ap: ctx
-                            .build
-                            .annotation_property(property::iao::REPLACED_BY),
+                        ap: ctx.build.annotation_property(property::iao::REPLACED_BY),
                         av: owl::AnnotationValue::IRI(id.into_owl(ctx)),
                     },
                 }))
@@ -327,18 +321,18 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::IntersectionOf(None, cid) => {
                 Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
                     owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
-                    owl::ClassExpression::ObjectIntersectionOf(
-                        vec![owl::ClassExpression::from(owl::Class(cid.into_owl(ctx)))],
-                    ),
+                    owl::ClassExpression::ObjectIntersectionOf(vec![owl::ClassExpression::from(
+                        owl::Class(cid.into_owl(ctx)),
+                    )]),
                 ])))
             }
 
             obo::TermClause::UnionOf(cid) => {
                 Some(owl::AnnotatedAxiom::from(owl::EquivalentClasses(vec![
                     owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
-                    owl::ClassExpression::ObjectUnionOf(
-                        vec![owl::ClassExpression::from(owl::Class(cid.into_owl(ctx)))],
-                    ),
+                    owl::ClassExpression::ObjectUnionOf(vec![owl::ClassExpression::from(
+                        owl::Class(cid.into_owl(ctx)),
+                    )]),
                 ])))
             }
 
@@ -353,9 +347,11 @@ impl IntoOwlCtx for obo::TermClause {
             obo::TermClause::IntersectionOf(Some(rid), cid) => Some(owl::AnnotatedAxiom::from(
                 owl::Axiom::EquivalentClasses(owl::EquivalentClasses(vec![
                     owl::ClassExpression::from(owl::Class(ctx.current_frame.clone())),
-                    owl::ClassExpression::ObjectIntersectionOf(
-                        vec![ctx.rel_class_expression(&obo::QualifierList::default(), *rid, *cid)],
-                    ),
+                    owl::ClassExpression::ObjectIntersectionOf(vec![ctx.rel_class_expression(
+                        &obo::QualifierList::default(),
+                        *rid,
+                        *cid,
+                    )]),
                 ])),
             )),
         }

@@ -13,15 +13,13 @@ impl IntoOwlCtx for obo::Definition {
             owl::AnnotationAssertion::new(
                 owl::Individual::from(&ctx.current_frame),
                 owl::Annotation {
-                    ap: ctx
-                        .build
-                        .annotation_property(property::iao::DEFINITION),
+                    ap: ctx.build.annotation_property(property::iao::DEFINITION),
                     av: owl::AnnotationValue::Literal(owl::Literal::Simple {
                         literal: self.text().as_str().to_string(),
                     }),
-                }
+                },
             ),
-            xrefs.into_owl(ctx)
+            xrefs.into_owl(ctx),
         )
     }
 }

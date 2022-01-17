@@ -7,8 +7,8 @@ use fastobo::ast as obo;
 use fastobo::semantics::Identified;
 use horned_owl::model as owl;
 
-use super::into_owl::IntoOwlCtx;
 use super::into_owl::Context;
+use super::into_owl::IntoOwlCtx;
 use super::utils::hashset_take_arbitrary;
 
 // ---------------------------------------------------------------------------
@@ -41,8 +41,7 @@ impl ImportProvider for FoundryProvider {
         let resource = url.as_str().rsplit('/').next().unwrap();
         let mut data = match Path::new(resource).extension() {
             Some(x) if x == "obo" => {
-                let mut doc = fastobo::from_reader(&mut buf)
-                    .expect("could not parse OBO document");
+                let mut doc = fastobo::from_reader(&mut buf).expect("could not parse OBO document");
                 doc.treat_xrefs();
                 ImportData::from(doc)
             }
@@ -60,7 +59,8 @@ impl ImportProvider for FoundryProvider {
             // import the import in the document and add them to the `ImportData`.
             let import_data = self.import(&i)?;
             data.imports.extend(import_data.imports);
-            data.annotation_properties.extend(import_data.annotation_properties);
+            data.annotation_properties
+                .extend(import_data.annotation_properties);
         }
 
         Ok(data)
@@ -75,7 +75,6 @@ pub struct ImportData {
     // Needed to check no class-level relationship is used in an
     // `intersection_of` clause (in theory...)
     // class_level_rel: HashSet<obo::RelationIdent>,
-
     /// The set of annotation properties declared in the document.
     ///
     /// Needed for for `rel(.., .., ..)` translation.

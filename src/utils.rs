@@ -1,11 +1,9 @@
 use std::collections::HashSet;
-use std::hash::Hash;
 use std::hash::BuildHasher;
+use std::hash::Hash;
 
 /// Takes an arbitrary element from a `HashSet`, or None if empty.
-pub fn hashset_take_arbitrary<K, S> (
-    set: &mut HashSet<K, S>,
-) -> Option<K>
+pub fn hashset_take_arbitrary<K, S>(set: &mut HashSet<K, S>) -> Option<K>
 where
     K: Hash + Eq,
     S: BuildHasher,
@@ -15,10 +13,10 @@ where
             /* must hide the origin of this borrow ... */
             unsafe { &*(key_ref as *const _) }
         } else {
-            return None
+            return None;
         }
     };
     /* ... so that we may be able to mutably borrow the set here
-       despite key_ref existence */
+    despite key_ref existence */
     set.take(key_ref)
 }

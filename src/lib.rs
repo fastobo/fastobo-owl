@@ -8,12 +8,12 @@ extern crate lazy_static;
 extern crate ureq;
 
 pub mod constants;
-mod into_owl;
 mod imports;
+mod into_owl;
 mod utils;
 
-pub use into_owl::IntoOwl;
 pub use imports::ImportData;
+pub use into_owl::IntoOwl;
 
 // ---------------------------------------------------------------------------
 
@@ -29,7 +29,9 @@ pub fn obo_prefixes() -> curie::PrefixMapping {
     prefixes.add_prefix("xsd", constants::uri::XSD).unwrap();
     prefixes.add_prefix("owl", constants::uri::OWL).unwrap();
     prefixes.add_prefix("obo", constants::uri::OBO).unwrap();
-    prefixes.add_prefix("oboInOwl", constants::uri::OBO_IN_OWL).unwrap();
+    prefixes
+        .add_prefix("oboInOwl", constants::uri::OBO_IN_OWL)
+        .unwrap();
     prefixes.add_prefix("xml", constants::uri::XML).unwrap();
     prefixes.add_prefix("rdf", constants::uri::RDF).unwrap();
     prefixes.add_prefix("dc", constants::uri::DC).unwrap();

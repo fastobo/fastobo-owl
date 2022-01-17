@@ -135,9 +135,9 @@ impl Context {
             if n == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                    bce: Box::new(owl::ClassExpression::ObjectComplementOf(
-                        Box::new(owl::Class(c_iri).into()),
-                    )),
+                    bce: Box::new(owl::ClassExpression::ObjectComplementOf(Box::new(
+                        owl::Class(c_iri).into(),
+                    ))),
                 };
             } else {
                 return owl::ClassExpression::ObjectExactCardinality {
@@ -156,9 +156,9 @@ impl Context {
             if na == 0 {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                    bce: Box::new(owl::ClassExpression::ObjectComplementOf(
-                        Box::new(owl::Class(c_iri).into()),
-                    )),
+                    bce: Box::new(owl::ClassExpression::ObjectComplementOf(Box::new(
+                        owl::Class(c_iri).into(),
+                    ))),
                 };
             }
         }
@@ -173,24 +173,22 @@ impl Context {
                     .value()
                     .parse()
                     .expect("invalid value for `max_cardinality`");
-                return owl::ClassExpression::ObjectIntersectionOf(
-                    vec![
-                        owl::ClassExpression::ObjectMinCardinality {
-                            n: na,
-                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
-                                r_iri.clone(),
-                            )),
-                            bce: Box::new(owl::Class(c_iri.clone()).into()),
-                        },
-                        owl::ClassExpression::ObjectMaxCardinality {
-                            n: nb,
-                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
-                                r_iri.clone(),
-                            )),
-                            bce: Box::new(owl::Class(c_iri.clone()).into()),
-                        },
-                    ],
-                );
+                return owl::ClassExpression::ObjectIntersectionOf(vec![
+                    owl::ClassExpression::ObjectMinCardinality {
+                        n: na,
+                        ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            r_iri.clone(),
+                        )),
+                        bce: Box::new(owl::Class(c_iri.clone()).into()),
+                    },
+                    owl::ClassExpression::ObjectMaxCardinality {
+                        n: nb,
+                        ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            r_iri.clone(),
+                        )),
+                        bce: Box::new(owl::Class(c_iri.clone()).into()),
+                    },
+                ]);
             } else {
                 return owl::ClassExpression::ObjectMinCardinality {
                     n: na,
@@ -206,30 +204,28 @@ impl Context {
                     .parse()
                     .expect("invalid value for `maxCardinality`"),
                 ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(r_iri)),
-                bce: Box::new(owl::ClassExpression::ObjectComplementOf(
-                    Box::new(owl::Class(c_iri).into()),
-                )),
+                bce: Box::new(owl::ClassExpression::ObjectComplementOf(Box::new(
+                    owl::Class(c_iri).into(),
+                ))),
             };
         }
 
         if qualifiers.iter().any(|q| q.key() == &*ALL_ONLY) {
             if qualifiers.iter().any(|q| q.key() == &*ALL_SOME) {
-                return owl::ClassExpression::ObjectIntersectionOf(
-                    vec![
-                        owl::ClassExpression::ObjectSomeValuesFrom {
-                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
-                                r_iri.clone(),
-                            )),
-                            bce: Box::new(owl::Class(c_iri.clone()).into()),
-                        },
-                        owl::ClassExpression::ObjectAllValuesFrom {
-                            ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
-                                r_iri,
-                            )),
-                            bce: Box::new(owl::Class(c_iri).into()),
-                        },
-                    ],
-                );
+                return owl::ClassExpression::ObjectIntersectionOf(vec![
+                    owl::ClassExpression::ObjectSomeValuesFrom {
+                        ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            r_iri.clone(),
+                        )),
+                        bce: Box::new(owl::Class(c_iri.clone()).into()),
+                    },
+                    owl::ClassExpression::ObjectAllValuesFrom {
+                        ope: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty(
+                            r_iri,
+                        )),
+                        bce: Box::new(owl::Class(c_iri).into()),
+                    },
+                ]);
             } else {
                 return owl::ClassExpression::ObjectAllValuesFrom {
                     ope: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
@@ -286,7 +282,11 @@ impl From<&obo::OboDoc> for Context {
 
         // Add the shorthands from the OBO typdef
         let mut shorthands = HashMap::new();
-        for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef_frame) {
+        for frame in doc
+            .entities()
+            .iter()
+            .flat_map(obo::EntityFrame::as_typedef_frame)
+        {
             let id = frame.id().as_ref().as_ref();
             if let obo::Ident::Unprefixed(unprefixed) = id {
                 if let Some(short) = Context::find_shorthand(frame) {
@@ -316,7 +316,11 @@ impl From<&obo::OboDoc> for Context {
         //     perform OBO ID to IRI conversion for the typedefs, which
         //     already requires a context (in case the typedef has a prefixed
         //     identifier).
-        for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef_frame) {
+        for frame in doc
+            .entities()
+            .iter()
+            .flat_map(obo::EntityFrame::as_typedef_frame)
+        {
             let is_metadata_tag = frame.iter().any(|line| match line.as_inner() {
                 obo::TypedefClause::IsMetadataTag(true) => true,
                 _ => false,

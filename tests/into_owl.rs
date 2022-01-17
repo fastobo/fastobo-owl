@@ -5,8 +5,8 @@ extern crate pretty_assertions;
 
 use std::path::PathBuf;
 
-use pretty_assertions::assert_eq;
 use fastobo_owl::IntoOwl;
+use pretty_assertions::assert_eq;
 
 macro_rules! converttest {
     ($name:ident) => {
@@ -30,11 +30,11 @@ macro_rules! converttest {
             // horned_owl::io::writer::write(&mut std::io::stdout(), &actual, Some(&PREFIXES));
 
             // Read the expected OWL
-            let (expected, _prefixes) = horned_owl::io::owx::reader::read(&mut std::io::BufReader::new(
-                std::fs::File::open(&output_path).expect("could not open output file"),
-            ))
-            .expect("could not parse output file");
-
+            let (expected, _prefixes) =
+                horned_owl::io::owx::reader::read(&mut std::io::BufReader::new(
+                    std::fs::File::open(&output_path).expect("could not open output file"),
+                ))
+                .expect("could not parse output file");
 
             // reorder
             let mut exp: Vec<_> = expected.iter().collect();
