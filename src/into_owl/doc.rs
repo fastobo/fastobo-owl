@@ -1,22 +1,33 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
 use horned_owl::model::MutableOntology;
+use horned_owl::model::Ontology;
 use horned_owl::ontology::set::SetOntology;
 
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
+use crate::constants::uri;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = SetOntology;
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
         let mut ont = SetOntology::new();
 
-        // TODO: declare the IRI and Version IRI for the ontology.
-        // ont.id = owl::OntologyID {
-        //     iri: Some(), // http://purl.obolibrary.org/obo/{ontology}.owl
-        //     viri: Some(), // http://purl.obolibrary.org/obo/{ontology}/{data-version}/{ontology}.owl
-        // }:
+        // declare the IRI and Version IRI for the ontology.
+        if let Some(name) = self.header().iter().find_map(|c| match c {
+            obo::HeaderClause::Ontology(name) => Some(name),
+            _ => None,
+        }) {
+            // persistent URL
+            let url = format!("{}{}.owl", uri::OBO, name);
+            ont.mut_id().iri = Some(ctx.build.iri(url));
+            // version-specific URL
+            if let Ok(dv) = self.header().data_version() {
+                let url = format!("{}{}/{}/{}.owl", uri::OBO, name, dv, name);
+                ont.mut_id().viri = Some(ctx.build.iri(url));
+            }
+        }
 
         // Convert the header frame: most frames end up as Ontology annotations,
         // but some of hem require extra axioms.
