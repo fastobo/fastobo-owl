@@ -69,8 +69,7 @@ impl IntoOwl for obo::OboDoc {
         // Extract conversion context from the document.
         let mut ctx = Context::from(&self);
 
-        // TODO
-        // // Extract the data needed for conversion from the imports.
+        // // TODO: Extract the data needed for conversion from the imports.
         // let mut provider = FoundryProvider::default();
         // for clause in self.header() {
         //     if let obo::HeaderClause::Import(i) = clause {

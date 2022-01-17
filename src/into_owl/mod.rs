@@ -286,13 +286,11 @@ impl From<&obo::OboDoc> for Context {
 
         // Add the shorthands from the OBO typdef
         let mut shorthands = HashMap::new();
-        for frame in doc.entities() {
-            if let obo::EntityFrame::Typedef(typedef) = frame {
-                let id = typedef.id().as_ref().as_ref();
-                if let obo::Ident::Unprefixed(unprefixed) = id {
-                    if let Some(short) = Context::find_shorthand(typedef) {
-                        shorthands.insert(unprefixed.deref().clone(), short.clone());
-                    }
+        for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef_frame) {
+            let id = frame.id().as_ref().as_ref();
+            if let obo::Ident::Unprefixed(unprefixed) = id {
+                if let Some(short) = Context::find_shorthand(frame) {
+                    shorthands.insert(unprefixed.deref().clone(), short.clone());
                 }
             }
         }
@@ -301,18 +299,43 @@ impl From<&obo::OboDoc> for Context {
         let build: horned_owl::model::Build = Default::default();
         let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.as_str().to_string());
-        let class_level = Default::default(); // TODO: extract class-level relationships
-        let metadata_tag = Default::default(); // TODO: extract annotation properties
-
-        Context {
+        let mut ctx = Context {
             build,
             idspaces,
             ontology_iri,
             current_frame,
-            class_level,
-            metadata_tag,
             shorthands,
+            metadata_tag: Default::default(),
+            class_level: Default::default(),
             in_annotation: false,
+        };
+
+        // Retrieve class-level relationships and annotation properties
+        //
+        // NB: this is done after the context is created because we need to
+        //     perform OBO ID to IRI conversion for the typedefs, which
+        //     already requires a context (in case the typedef has a prefixed
+        //     identifier).
+        for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef_frame) {
+            let is_metadata_tag = frame.iter().any(|line| match line.as_inner() {
+                obo::TypedefClause::IsMetadataTag(true) => true,
+                _ => false,
+            });
+            let is_class_level = frame.iter().any(|line| match line.as_inner() {
+                obo::TypedefClause::IsClassLevel(true) => true,
+                _ => false,
+            });
+            if is_metadata_tag || is_class_level {
+                let iri = frame.id().as_ref().clone().into_owl(&mut ctx);
+                if is_class_level {
+                    ctx.class_level.insert(iri.clone());
+                }
+                if is_metadata_tag {
+                    ctx.metadata_tag.insert(iri.clone());
+                }
+            }
         }
+
+        ctx
     }
 }
