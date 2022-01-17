@@ -150,8 +150,18 @@ impl IntoOwlCtx for obo::TypedefClause {
                     ann: pv.into_owl(ctx),
                 }))
             }
-            // obo::TypedefClause::Domain(ClassIdent),
-            // obo::TypedefClause::Range(ClassIdent),
+            obo::TypedefClause::Domain(cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::ObjectPropertyDomain {
+                    ope: owl::ObjectPropertyExpression::from(&ctx.current_frame),
+                    ce: owl::ClassExpression::Class(owl::Class::from(cid.into_owl(ctx))),
+                }))
+            }
+            obo::TypedefClause::Range(cid) => {
+                Some(owl::AnnotatedAxiom::from(owl::ObjectPropertyRange {
+                    ope: owl::ObjectPropertyExpression::from(&ctx.current_frame),
+                    ce: owl::ClassExpression::Class(owl::Class::from(cid.into_owl(ctx))),
+                }))
+            }
             obo::TypedefClause::Builtin(_) => None,
             obo::TypedefClause::HoldsOverChain(r1, r2) => {
                 // holds_over_chain(Rel1-ID Rel2-ID Qualifiers) 	SubObjectPropertyOf(T(Qualifiers) ObjectPropertyChain( T(Rel1-ID) T(Rel2-ID) ) T(Rel-ID) )
@@ -221,7 +231,18 @@ impl IntoOwlCtx for obo::TypedefClause {
                     )))
                 }
             }
-            // obo::TypedefClause::DisjointFrom(RelationIdent),
+            obo::TypedefClause::DisjointFrom(rid) => {
+                if !ctx.in_annotation {
+                    Some(owl::AnnotatedAxiom::from(owl::DisjointObjectProperties(
+                        vec![
+                            owl::ObjectPropertyExpression::from(&ctx.current_frame),
+                            owl::ObjectPropertyExpression::ObjectProperty(rid.into_owl(ctx).into()),
+                        ],
+                    )))
+                } else {
+                    None
+                }
+            }
             obo::TypedefClause::InverseOf(rid) => {
                 Some(owl::AnnotatedAxiom::from(owl::InverseObjectProperties(
                     owl::ObjectProperty::from(&ctx.current_frame),

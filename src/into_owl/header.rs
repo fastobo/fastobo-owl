@@ -68,35 +68,31 @@ impl IntoOwlCtx for obo::HeaderClause {
             //         <rdfs:subPropertyOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#SubsetProperty"/>
             //     </owl:AnnotationProperty>
             obo::HeaderClause::Subsetdef(subset, desc) => vec![
-                owl::AnnotatedAxiom::from(
-                    owl::DeclareAnnotationProperty(owl::AnnotationProperty::from(subset.into_owl(ctx)))
-                ),
-                owl::AnnotatedAxiom::from(
-                    owl::SubAnnotationPropertyOf {
-                        sub: owl::AnnotationProperty::from(subset.into_owl(ctx)),
-                        sup: owl::AnnotationProperty::from(ctx.build.iri(property::obo_in_owl::SUBSET_PROPERTY)),
-                    }
-                ),
-                owl::AnnotatedAxiom::from(
-                        owl::AnnotationAssertion {
-                        subject: owl::Individual::from(subset.into_owl(ctx)),
-                        ann: owl::Annotation {
-                            ap: ctx.build.annotation_property(property::rdfs::LABEL),
-                            av: owl::AnnotationValue::Literal(owl::Literal::Simple {
-                                literal: subset.to_string()
-                            })
-                        }
-                    }
-                ),
-                owl::AnnotatedAxiom::from(
-                    owl::AnnotationAssertion {
-                        subject: owl::Individual::from(subset.into_owl(ctx)),
-                        ann: owl::Annotation {
-                            ap: ctx.build.annotation_property(property::rdfs::COMMENT),
-                            av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
-                        }
-                    }
-                )
+                owl::AnnotatedAxiom::from(owl::DeclareAnnotationProperty(
+                    owl::AnnotationProperty::from(subset.into_owl(ctx)),
+                )),
+                owl::AnnotatedAxiom::from(owl::SubAnnotationPropertyOf {
+                    sub: owl::AnnotationProperty::from(subset.into_owl(ctx)),
+                    sup: owl::AnnotationProperty::from(
+                        ctx.build.iri(property::obo_in_owl::SUBSET_PROPERTY),
+                    ),
+                }),
+                owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                    subject: owl::Individual::from(subset.into_owl(ctx)),
+                    ann: owl::Annotation {
+                        ap: ctx.build.annotation_property(property::rdfs::LABEL),
+                        av: owl::AnnotationValue::Literal(owl::Literal::Simple {
+                            literal: subset.to_string(),
+                        }),
+                    },
+                }),
+                owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                    subject: owl::Individual::from(subset.into_owl(ctx)),
+                    ann: owl::Annotation {
+                        ap: ctx.build.annotation_property(property::rdfs::COMMENT),
+                        av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
+                    },
+                }),
             ],
 
             // `owl:AnnotationProperty`
@@ -107,35 +103,33 @@ impl IntoOwlCtx for obo::HeaderClause {
             //      </owl:AnnotationProperty>
             obo::HeaderClause::SynonymTypedef(ty, desc, optscope) => {
                 let mut axioms = vec![
-                    owl::AnnotatedAxiom::from(
-                        owl::DeclareAnnotationProperty(owl::AnnotationProperty::from(ty.into_owl(ctx)))
-                    ),
-                    owl::AnnotatedAxiom::from(
-                        owl::SubAnnotationPropertyOf {
-                            sub: owl::AnnotationProperty::from(ty.into_owl(ctx)),
-                            sup: owl::AnnotationProperty::from(ctx.build.iri(property::obo_in_owl::SYNONYM_TYPE_PROPERTY)),
-                        }
-                    ),
-                    owl::AnnotatedAxiom::from(
-                        owl::AnnotationAssertion {
-                            subject: owl::Individual::from(ty.into_owl(ctx)),
-                            ann: owl::Annotation {
-                                ap: ctx.build.annotation_property(property::rdfs::LABEL),
-                                av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
-                            }
-                        }
-                    ),
+                    owl::AnnotatedAxiom::from(owl::DeclareAnnotationProperty(
+                        owl::AnnotationProperty::from(ty.into_owl(ctx)),
+                    )),
+                    owl::AnnotatedAxiom::from(owl::SubAnnotationPropertyOf {
+                        sub: owl::AnnotationProperty::from(ty.into_owl(ctx)),
+                        sup: owl::AnnotationProperty::from(
+                            ctx.build.iri(property::obo_in_owl::SYNONYM_TYPE_PROPERTY),
+                        ),
+                    }),
+                    owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                        subject: owl::Individual::from(ty.into_owl(ctx)),
+                        ann: owl::Annotation {
+                            ap: ctx.build.annotation_property(property::rdfs::LABEL),
+                            av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
+                        },
+                    }),
                 ];
                 if let Some(scope) = optscope {
-                    axioms.push(owl::AnnotatedAxiom::from(
-                        owl::AnnotationAssertion {
-                            subject: owl::Individual::from(ty.into_owl(ctx)),
-                            ann: owl::Annotation {
-                                ap: ctx.build.annotation_property(property::obo_in_owl::HAS_SCOPE),
-                                av: owl::AnnotationValue::IRI(scope.into_owl(ctx)),
-                            }
-                        }
-                    ));
+                    axioms.push(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                        subject: owl::Individual::from(ty.into_owl(ctx)),
+                        ann: owl::Annotation {
+                            ap: ctx
+                                .build
+                                .annotation_property(property::obo_in_owl::HAS_SCOPE),
+                            av: owl::AnnotationValue::IRI(scope.into_owl(ctx)),
+                        },
+                    }));
                 }
                 axioms
             }
@@ -169,8 +163,8 @@ impl IntoOwlCtx for obo::HeaderClause {
 
             // no equivalent, macros should be resolved before conversion.
             obo::HeaderClause::TreatXrefsAsEquivalent(_) => Vec::new(),
-            obo::HeaderClause::TreatXrefsAsGenusDifferentia(_, _, _) =>Vec::new(),
-            obo::HeaderClause::TreatXrefsAsReverseGenusDifferentia(_, _, _) =>Vec::new(),
+            obo::HeaderClause::TreatXrefsAsGenusDifferentia(_, _, _) => Vec::new(),
+            obo::HeaderClause::TreatXrefsAsReverseGenusDifferentia(_, _, _) => Vec::new(),
             obo::HeaderClause::TreatXrefsAsRelationship(_, _) => Vec::new(),
             obo::HeaderClause::TreatXrefsAsIsA(_) => Vec::new(),
             obo::HeaderClause::TreatXrefsAsHasSubclass(_) => Vec::new(),
