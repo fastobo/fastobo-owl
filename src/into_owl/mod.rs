@@ -82,15 +82,21 @@ pub struct Context {
     /// A mapping
     pub shorthands: HashMap<obo::UnprefixedIdent, obo::Ident>,
 
-    /// A set of IRI which refer to class level annotation relationships.
+    /// A set of IRI which refer to class level relationships.
     ///
     /// This is likely to require processing imports beforehand.
     pub class_level: HashSet<owl::IRI>,
+
+    /// A set or IRI which refer to metadata tag typedef.
+    ///
+    /// Properties that are marked as metadata tags are used to record object
+    /// metadata and are translated to annotation properties.
+    pub metadata_tag: HashSet<owl::IRI>,
 }
 
 impl Context {
     pub fn find_shorthand(frame: &obo::TypedefFrame) -> Option<&obo::Ident> {
-        if let obo::Ident::Unprefixed(old_id) = frame.id().as_inner().as_ref() {
+        if let obo::Ident::Unprefixed(_) = frame.id().as_inner().as_ref() {
             // FIXME: right now this takes the first xref of a typedef,
             //        assuming there is only one, but priority rules from
             //        the OBO 1.4 specs should be implemented.
@@ -109,6 +115,10 @@ impl Context {
 
     pub fn is_class_level(&mut self, rid: &owl::IRI) -> bool {
         self.class_level.contains(&rid)
+    }
+
+    pub fn is_metadata_tag(&mut self, rid: &owl::IRI) -> bool {
+        self.metadata_tag.contains(&rid)
     }
 
     pub fn rel_class_expression(
@@ -202,8 +212,8 @@ impl Context {
             };
         }
 
-        if let Some(q_only) = qualifiers.iter().find(|q| q.key() == &*ALL_ONLY) {
-            if let Some(q_some) = qualifiers.iter().find(|q| q.key() == &*ALL_SOME) {
+        if qualifiers.iter().any(|q| q.key() == &*ALL_ONLY) {
+            if qualifiers.iter().any(|q| q.key() == &*ALL_SOME) {
                 return owl::ClassExpression::ObjectIntersectionOf(
                     vec![
                         owl::ClassExpression::ObjectSomeValuesFrom {
@@ -291,8 +301,8 @@ impl From<&obo::OboDoc> for Context {
         let build: horned_owl::model::Build = Default::default();
         let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.as_str().to_string());
-        let class_level = Default::default(); // TODO: extract annotation properties
-        //let shorthands = Default::default(); // TODO: extract shorthands
+        let class_level = Default::default(); // TODO: extract class-level relationships
+        let metadata_tag = Default::default(); // TODO: extract annotation properties
 
         Context {
             build,
@@ -300,6 +310,7 @@ impl From<&obo::OboDoc> for Context {
             ontology_iri,
             current_frame,
             class_level,
+            metadata_tag,
             shorthands,
             in_annotation: false,
         }

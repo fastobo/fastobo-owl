@@ -117,8 +117,16 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
             //
             obo::TermClause::Relationship(rid, cid) => {
                 let r_iri = rid.clone().into_owl(ctx);
-                if ctx.is_class_level(&r_iri) {
-                    unimplemented!()
+                if ctx.is_metadata_tag(&r_iri) {
+                    Some(owl::AnnotatedAxiom::from(
+                      owl::AnnotationAssertion {
+                          subject: owl::Individual::Named(owl::NamedIndividual::from(&ctx.current_frame)),
+                          ann: owl::Annotation {
+                              ap: owl::AnnotationProperty::from(r_iri),
+                              av: owl::AnnotationValue::from(cid.clone().into_owl(ctx)),
+                          }
+                      }
+                  ))
                 } else {
                     Some(owl::AnnotatedAxiom::new(
                         owl::Axiom::SubClassOf(owl::SubClassOf {

@@ -17,11 +17,12 @@ fn main() {
 
         // Convert to OWL
         let prefixes = obodoc.prefixes();
-        let owldoc = obodoc.into_owl();
+        let owldoc = obodoc.into_owl().into();
 
         // Write it back
         let file = std::fs::File::create(path.with_extension("owl")).unwrap();
         let mut w = std::io::BufWriter::new(file);
-        horned_owl::io::owx::writer::write(&mut w, &owldoc.into(), Some(&prefixes)).unwrap();
+        horned_owl::io::owx::writer::write(&mut w, &owldoc, Some(&prefixes)).unwrap();
+        // horned_owl::io::rdf::writer::write(&mut w, &owldoc).unwrap();
     }
 }

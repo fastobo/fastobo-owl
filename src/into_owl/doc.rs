@@ -1,6 +1,5 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
-use horned_owl::model as owl;
 use horned_owl::model::MutableOntology;
 use horned_owl::ontology::set::SetOntology;
 
@@ -41,7 +40,7 @@ impl IntoOwlCtx for obo::OboDoc {
                         ont.insert(axiom);
                     }
                 }
-                _ => (), // Individuals are ignored
+                _ => (), // NB: individuals are ignored
             };
         }
 
@@ -55,7 +54,7 @@ impl IntoOwl for obo::OboDoc {
         let mut mapping = crate::obo_prefixes();
         for clause in self.header() {
             if let obo::HeaderClause::Idspace(prefix, url, _) = clause {
-                mapping.add_prefix(prefix.as_str(), url.as_str());
+                mapping.add_prefix(prefix.as_str(), url.as_str()).ok();
             }
         }
         mapping
@@ -63,7 +62,7 @@ impl IntoOwl for obo::OboDoc {
 
     fn into_owl(mut self) -> SetOntology {
         // Assign default namespaces to entities missing one.
-        self.assign_namespaces(); // ignore errors
+        self.assign_namespaces().ok(); // ignore errors
         // Process the xref header macros.
         self.treat_xrefs();
 

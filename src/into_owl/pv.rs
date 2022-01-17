@@ -1,5 +1,3 @@
-use std::mem::take;
-
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
