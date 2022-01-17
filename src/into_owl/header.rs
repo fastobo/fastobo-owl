@@ -1,6 +1,3 @@
-use std::collections::BTreeSet;
-use std::iter::FromIterator;
-
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 
@@ -70,23 +67,37 @@ impl IntoOwlCtx for obo::HeaderClause {
             //         <rdfs:comment rdf:datatype="xsd:string">T(description)</rdfs:comment>
             //         <rdfs:subPropertyOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#SubsetProperty"/>
             //     </owl:AnnotationProperty>
-            obo::HeaderClause::Subsetdef(subset, desc) => vec![owl::AnnotatedAxiom::new(
-                owl::AnnotationAssertion {
-                    subject: owl::Individual::from(subset.into_owl(ctx)),
-                    ann: owl::Annotation {
-                        ap: ctx
-                            .build
-                            .annotation_property(property::rdfs::SUB_PROPERTY_OF),
-                        av: owl::AnnotationValue::IRI(
-                            ctx.build.iri(property::obo_in_owl::SUBSET_PROPERTY),
-                        ),
-                    },
-                },
-                BTreeSet::from_iter(Some(owl::Annotation {
-                    ap: ctx.build.annotation_property(property::rdfs::COMMENT),
-                    av: desc.into_owl(ctx).into(),
-                })),
-            )],
+            obo::HeaderClause::Subsetdef(subset, desc) => vec![
+                owl::AnnotatedAxiom::from(
+                    owl::DeclareAnnotationProperty(owl::AnnotationProperty::from(subset.into_owl(ctx)))
+                ),
+                owl::AnnotatedAxiom::from(
+                    owl::SubAnnotationPropertyOf {
+                        sub: owl::AnnotationProperty::from(subset.into_owl(ctx)),
+                        sup: owl::AnnotationProperty::from(ctx.build.iri(property::obo_in_owl::SUBSET_PROPERTY)),
+                    }
+                ),
+                owl::AnnotatedAxiom::from(
+                        owl::AnnotationAssertion {
+                        subject: owl::Individual::from(subset.into_owl(ctx)),
+                        ann: owl::Annotation {
+                            ap: ctx.build.annotation_property(property::rdfs::LABEL),
+                            av: owl::AnnotationValue::Literal(owl::Literal::Simple {
+                                literal: subset.to_string()
+                            })
+                        }
+                    }
+                ),
+                owl::AnnotatedAxiom::from(
+                    owl::AnnotationAssertion {
+                        subject: owl::Individual::from(subset.into_owl(ctx)),
+                        ann: owl::Annotation {
+                            ap: ctx.build.annotation_property(property::rdfs::COMMENT),
+                            av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
+                        }
+                    }
+                )
+            ],
 
             // `owl:AnnotationProperty`
             //      <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/go#systematic_synonym">
@@ -94,7 +105,6 @@ impl IntoOwlCtx for obo::HeaderClause {
             //          <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Systematic synonym</rdfs:label>
             //          <rdfs:subPropertyOf rdf:resource="http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty"/>
             //      </owl:AnnotationProperty>
-            // FIXME: Add description and scope
             obo::HeaderClause::SynonymTypedef(ty, desc, optscope) => {
                 let mut axioms = vec![
                     owl::AnnotatedAxiom::from(

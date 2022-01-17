@@ -54,5 +54,6 @@ converttest!(intersection_of);
 converttest!(is_a);
 converttest!(name);
 converttest!(qualifier);
-converttest!(union_of);
+converttest!(subsetdef);
 converttest!(synonym);
+converttest!(union_of);

@@ -1,0 +1,6 @@
+ontology: tst
+subsetdef: goslim_mouse "Mouse GO slim"
+
+[Term]
+id: TST:01
+subset: goslim_mouse

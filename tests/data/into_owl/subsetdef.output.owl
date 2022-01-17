@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#">
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="dc" IRI="http://purl.org/dc/elements/1.1/"/>
+    <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+
+    <!-- Declaration -->
+    <Declaration>
+        <Class IRI="http://purl.obolibrary.org/obo/TST_01"/>
+    </Declaration>
+    <Declaration>
+        <AnnotationProperty IRI="http://purl.obolibrary.org/obo/tst#goslim_mouse"/>
+    </Declaration>
+
+    <!-- translation of subsetdef -->
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <NamedIndividual IRI="http://purl.obolibrary.org/obo/tst#goslim_mouse"/>
+        <Literal>Mouse GO slim</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <NamedIndividual IRI="http://purl.obolibrary.org/obo/tst#goslim_mouse"/>
+        <Literal>goslim_mouse</Literal>
+    </AnnotationAssertion>
+    <SubAnnotationPropertyOf>
+        <AnnotationProperty IRI="http://purl.obolibrary.org/obo/tst#goslim_mouse"/>
+        <AnnotationProperty IRI="http://www.geneontology.org/formats/oboInOwl#SubsetProperty"/>
+    </SubAnnotationPropertyOf>
+
+    <!-- Translation of TST:01 id -->
+    <AnnotationAssertion>
+        <AnnotationProperty IRI="http://www.geneontology.org/formats/oboInOwl#id"/>
+        <NamedIndividual abbreviatedIRI="http://purl.obolibrary.org/obo/TST_01"/>
+        <Literal>TST:01</Literal>
+    </AnnotationAssertion>
+
+    <!-- Translation of TST:01 subset clause -->
+    <AnnotationAssertion>
+        <AnnotationProperty IRI="http://www.geneontology.org/formats/oboInOwl#inSubset"/>
+        <NamedIndividual abbreviatedIRI="http://purl.obolibrary.org/obo/TST_01"/>
+        <AbbreviatedIRI>obo:tst#goslim_mouse</AbbreviatedIRI>
+    </AnnotationAssertion>
+</Ontology>

@@ -81,7 +81,6 @@ pub mod property {
     pub mod rdfs {
         pub const LABEL: &str = concat!(rdfs!(), "label");
         pub const COMMENT: &str = concat!(rdfs!(), "comment");
-        pub const SUB_PROPERTY_OF: &str = concat!(rdfs!(), "subPropertyOf");
     }
 
     /// Dublin core annotation properties.
