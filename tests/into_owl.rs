@@ -6,8 +6,6 @@ extern crate pretty_assertions;
 use std::path::PathBuf;
 
 use pretty_assertions::assert_eq;
-
-use fastobo::ast::OboDoc;
 use fastobo_owl::IntoOwl;
 
 macro_rules! converttest {
@@ -37,7 +35,14 @@ macro_rules! converttest {
             ))
             .expect("could not parse output file");
 
-            assert_eq!(actual, expected);
+
+            // reorder
+            let mut exp: Vec<_> = expected.iter().collect();
+            exp.sort();
+            let mut act: Vec<_> = actual.iter().collect();
+            act.sort();
+
+            assert_eq!(act, exp);
         }
     };
 }
