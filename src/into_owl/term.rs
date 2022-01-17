@@ -117,7 +117,7 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
             )),
             //
             obo::TermClause::Relationship(rid, cid) => {
-                let r_iri = rid.clone().into_owl(ctx);
+                let r_iri = rid.into_owl(ctx);
                 if ctx.is_metadata_tag(&r_iri) {
                     Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
                         subject: owl::Individual::Named(owl::NamedIndividual::from(
@@ -125,7 +125,7 @@ impl IntoOwlCtx for obo::Line<obo::TermClause> {
                         )),
                         ann: owl::Annotation {
                             ap: owl::AnnotationProperty::from(r_iri),
-                            av: owl::AnnotationValue::from(cid.clone().into_owl(ctx)),
+                            av: owl::AnnotationValue::from(cid.into_owl(ctx)),
                         },
                     }))
                 } else {

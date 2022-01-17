@@ -2,6 +2,7 @@ use std::collections::HashSet;
 use std::hash::BuildHasher;
 use std::hash::Hash;
 
+#[allow(unused)]
 /// Takes an arbitrary element from a `HashSet`, or None if empty.
 pub fn hashset_take_arbitrary<K, S>(set: &mut HashSet<K, S>) -> Option<K>
 where

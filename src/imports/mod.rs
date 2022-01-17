@@ -1,7 +1,5 @@
 use std::collections::HashSet;
-use std::io::BufReader;
 use std::ops::Deref;
-use std::path::Path;
 
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
@@ -9,7 +7,7 @@ use horned_owl::model as owl;
 
 use super::into_owl::Context;
 use super::into_owl::IntoOwlCtx;
-use super::utils::hashset_take_arbitrary;
+// use super::utils::hashset_take_arbitrary;
 
 // ---------------------------------------------------------------------------
 

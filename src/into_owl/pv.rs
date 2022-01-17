@@ -9,13 +9,13 @@ impl IntoOwlCtx for obo::PropertyValue {
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         match self {
             obo::PropertyValue::Resource(pv) => owl::Annotation {
-                ap: owl::AnnotationProperty(pv.property().clone().into_owl(ctx)),
-                av: owl::AnnotationValue::IRI(pv.target().clone().into_owl(ctx)),
+                ap: owl::AnnotationProperty(pv.property().into_owl(ctx)),
+                av: owl::AnnotationValue::IRI(pv.target().into_owl(ctx)),
             },
             obo::PropertyValue::Literal(pv) => owl::Annotation {
-                ap: owl::AnnotationProperty(pv.property().clone().into_owl(ctx)),
+                ap: owl::AnnotationProperty(pv.property().into_owl(ctx)),
                 av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                    datatype_iri: pv.datatype().clone().into_owl(ctx),
+                    datatype_iri: pv.datatype().into_owl(ctx),
                     literal: pv.literal().to_string(),
                 }),
             },
