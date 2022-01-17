@@ -5,7 +5,6 @@ use horned_owl::model as owl;
 
 use super::Context;
 use super::IntoOwlCtx;
-use crate::constants::datatype;
 
 lazy_static! {
     static ref EXCLUDED: BTreeSet<obo::RelationIdent> = {
@@ -30,13 +29,12 @@ impl IntoOwlCtx for obo::Qualifier {
                 self.key_mut(),
                 obo::UnprefixedIdent::new(String::new()).into(),
             );
-            let value = std::mem::replace(self.value_mut(), obo::QuotedString::new(String::new()));
+            let value = std::mem::take(self.value_mut());
             // Build the annotation.
             Some(owl::Annotation {
                 ap: key.into_owl(ctx).into(),
-                av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                    datatype_iri: ctx.build.iri(datatype::xsd::STRING),
-                    literal: value.into_string(),
+                av: owl::AnnotationValue::Literal(owl::Literal::Simple {
+                    literal: value.as_str().to_string(),
                 }),
             })
         } else {

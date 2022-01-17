@@ -45,8 +45,7 @@ impl IntoOwlCtx for obo::TypedefFrame {
             subject: owl::Individual::from(&id),
             ann: owl::Annotation {
                 ap: ctx.build.annotation_property(property::obo_in_owl::ID),
-                av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                    datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                av: owl::AnnotationValue::Literal(owl::Literal::Simple {
                     literal: self.id().as_ref().to_string(),
                 }),
             },

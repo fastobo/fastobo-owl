@@ -5,7 +5,6 @@ use horned_owl::model as owl;
 
 use super::Context;
 use super::IntoOwlCtx;
-use crate::constants::datatype;
 use crate::constants::property;
 
 // FIXME: Xrefs should probably be translated as IRIs instead of literals now
@@ -18,8 +17,7 @@ impl IntoOwlCtx for obo::Xref {
             ap: ctx
                 .build
                 .annotation_property(property::obo_in_owl::HAS_DBXREF),
-            av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+            av: owl::AnnotationValue::Literal(owl::Literal::Simple {
                 literal: self.id().to_string(),
             }),
         }

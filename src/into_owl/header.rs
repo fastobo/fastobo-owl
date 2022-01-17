@@ -6,7 +6,6 @@ use horned_owl::model as owl;
 
 use super::Context;
 use super::IntoOwlCtx;
-use crate::constants::datatype;
 use crate::constants::property;
 
 impl IntoOwlCtx for obo::HeaderClause {
@@ -116,8 +115,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                     ap: ctx
                         .build
                         .annotation_property(property::obo_in_owl::HAS_DEFAULT_NAMESPACE),
-                    av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                        datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                    av: owl::AnnotationValue::Literal(owl::Literal::Simple {
                         literal: ns.to_string(),
                     }),
                 }),
