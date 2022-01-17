@@ -7,19 +7,34 @@
   <Declaration>
       <Class IRI="http://purl.obolibrary.org/obo/TST_01"/>
   </Declaration>
+  <Declaration>
+      <AnnotationProperty IRI="http://purl.obolibrary.org/obo/tst#systematic_synonym"/>
+  </Declaration>
 
+  <!-- translation of systematic_synonym synonym type -->
+  <SubAnnotationPropertyOf>
+      <AnnotationProperty IRI="http://purl.obolibrary.org/obo/tst#systematic_synonym"/>
+      <AnnotationProperty IRI="http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty"/>
+  </SubAnnotationPropertyOf>
   <AnnotationAssertion>
-    <AnnotationProperty abbreviatedIRI="rdfs:subPropertyOf"/>
-    <IRI>http://purl.obolibrary.org/obo/tst#systematic_synonym</IRI>
-    <IRI>http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty</IRI>
+      <AnnotationProperty abbreviatedIRI="oboInOwl:hasScope"/>
+      <NamedIndividual abbreviatedIRI="obo:tst#systematic_synonym"/>
+      <AbbreviatedIRI>oboInOwl:hasExactSynonym</AbbreviatedIRI>
+  </AnnotationAssertion>
+  <AnnotationAssertion>
+      <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+      <NamedIndividual abbreviatedIRI="obo:tst#systematic_synonym"/>
+      <Literal>Systematic synonym</Literal>
   </AnnotationAssertion>
 
+  <!-- translation of TST:01 obo short name -->
   <AnnotationAssertion>
     <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
     <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:01</Literal>
   </AnnotationAssertion>
 
+  <!-- translation of TST:01 first synonym -->
   <AnnotationAssertion>
     <Annotation>
       <AnnotationProperty abbreviatedIRI="oboInOwl:hasDbXref"/>
@@ -30,6 +45,7 @@
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">something something</Literal>
   </AnnotationAssertion>
 
+  <!-- translation of TST:01 second synonym (w/ synonym type) -->
   <AnnotationAssertion>
     <Annotation>
       <AnnotationProperty abbreviatedIRI="oboInOwl:hasSynonymType"/>

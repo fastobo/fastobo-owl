@@ -98,6 +98,7 @@ jobs:
         command: publish
         args: '--token ${{ secrets.CRATES_IO_TOKEN }}'
   release:
+    name: Release
     environment: Release
     needs: publish
     runs-on: ubuntu-latest

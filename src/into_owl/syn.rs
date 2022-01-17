@@ -8,25 +8,12 @@ use crate::constants::property;
 impl IntoOwlCtx for obo::Synonym {
     type Owl = owl::AnnotatedAxiom;
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
-        // Get the annotation property URI
-        let uri = match self.scope() {
-            obo::SynonymScope::Exact => property::obo_in_owl::HAS_EXACT_SYNONYM,
-            obo::SynonymScope::Narrow => property::obo_in_owl::HAS_NARROW_SYNONYM,
-            obo::SynonymScope::Related => property::obo_in_owl::HAS_RELATED_SYNONYM,
-            obo::SynonymScope::Broad => property::obo_in_owl::HAS_BROAD_SYNONYM,
-        };
-
-        // Get the description
-        let d = std::mem::replace(
-            self.description_mut(),
-            obo::QuotedString::new(String::new()),
-        );
-
+        // Build the main assertion
         let axiom = owl::AnnotationAssertion {
             subject: owl::Individual::from(&ctx.current_frame),
             ann: owl::Annotation {
-                ap: ctx.build.annotation_property(uri),
-                av: d.into_owl(ctx).into(),
+                ap: owl::AnnotationProperty::from(self.scope().into_owl(ctx)),
+                av: std::mem::take(self.description_mut()).into_owl(ctx).into(),
             },
         };
 
@@ -42,5 +29,17 @@ impl IntoOwlCtx for obo::Synonym {
         }
 
         owl::AnnotatedAxiom::new(axiom, annotations)
+    }
+}
+
+impl IntoOwlCtx for &obo::SynonymScope {
+    type Owl = owl::IRI;
+    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+        ctx.build.iri(match self {
+            obo::SynonymScope::Broad => property::obo_in_owl::HAS_BROAD_SYNONYM,
+            obo::SynonymScope::Exact => property::obo_in_owl::HAS_EXACT_SYNONYM,
+            obo::SynonymScope::Narrow => property::obo_in_owl::HAS_NARROW_SYNONYM,
+            obo::SynonymScope::Related => property::obo_in_owl::HAS_RELATED_SYNONYM,
+        })
     }
 }

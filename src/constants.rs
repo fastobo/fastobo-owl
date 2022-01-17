@@ -57,6 +57,7 @@ pub mod property {
         pub const HAS_DEFAULT_NAMESPACE: &str = concat!(oboInOwl!(), "hasDefaultNamespace");
         pub const HAS_OBO_FORMAT_VERSION: &str = concat!(oboInOwl!(), "hasOBOFormatVersion");
         pub const HAS_OBO_NAMESPACE: &str = concat!(oboInOwl!(), "hasOBONamespace");
+        pub const HAS_SCOPE: &str = concat!(oboInOwl!(), "hasScope");
         pub const ID: &str = concat!(oboInOwl!(), "id");
         pub const IN_SUBSET: &str = concat!(oboInOwl!(), "inSubset");
         pub const NAMESPACE_ID_RULE: &str = concat!(oboInOwl!(), "NamespaceIdRule");
