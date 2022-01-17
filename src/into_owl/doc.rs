@@ -1,15 +1,17 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
 use horned_owl::model as owl;
+use horned_owl::model::MutableOntology;
+use horned_owl::ontology::set::SetOntology;
 
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
 
 impl IntoOwlCtx for obo::OboDoc {
-    type Owl = owl::Ontology;
+    type Owl = SetOntology;
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
-        let mut ont = owl::Ontology::new();
+        let mut ont = SetOntology::new();
 
         // TODO: declare the IRI and Version IRI for the ontology.
         // ont.id = owl::OntologyID {
@@ -60,7 +62,7 @@ impl IntoOwl for obo::OboDoc {
         mapping
     }
 
-    fn into_owl(mut self) -> owl::Ontology {
+    fn into_owl(mut self) -> SetOntology {
         // Process the xref header macros.
         // Assigning the default namespace is not needed since we are only
         // processing the current document, so there should be no namespace

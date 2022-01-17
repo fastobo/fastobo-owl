@@ -18,10 +18,9 @@ impl IntoOwlCtx for obo::Xref {
             ap: ctx
                 .build
                 .annotation_property(property::obo_in_owl::HAS_DBXREF),
-            av: owl::AnnotationValue::Literal(owl::Literal {
-                lang: None,
-                datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                literal: Some(self.id().to_string()),
+            av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
+                datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                literal: self.id().to_string(),
             }),
         }
     }

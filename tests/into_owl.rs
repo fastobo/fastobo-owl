@@ -32,12 +32,11 @@ macro_rules! converttest {
             // horned_owl::io::writer::write(&mut std::io::stdout(), &actual, Some(&PREFIXES));
 
             // Read the expected OWL
-            let (expected, _prefixes) = horned_owl::io::reader::read(&mut std::io::BufReader::new(
+            let (expected, _prefixes) = horned_owl::io::owx::reader::read(&mut std::io::BufReader::new(
                 std::fs::File::open(&output_path).expect("could not open output file"),
             ))
             .expect("could not parse output file");
 
-            // Test equality
             assert_eq!(actual, expected);
         }
     };

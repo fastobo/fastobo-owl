@@ -22,6 +22,6 @@ fn main() {
         // Write it back
         let file = std::fs::File::create(path.with_extension("owl")).unwrap();
         let mut w = std::io::BufWriter::new(file);
-        horned_owl::io::writer::write(&mut w, &owldoc, Some(&prefixes)).unwrap();
+        horned_owl::io::owx::writer::write(&mut w, &owldoc.into(), Some(&prefixes)).unwrap();
     }
 }

@@ -73,7 +73,7 @@ impl IntoOwlCtx for obo::HeaderClause {
             //     </owl:AnnotationProperty>
             obo::HeaderClause::Subsetdef(subset, desc) => Some(owl::AnnotatedAxiom::new(
                 owl::AnnotationAssertion {
-                    subject: obo::Ident::from(subset).into_owl(ctx),
+                    subject: owl::Individual::from(subset.into_owl(ctx)),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -98,7 +98,7 @@ impl IntoOwlCtx for obo::HeaderClause {
             // FIXME: Add description and scope
             obo::HeaderClause::SynonymTypedef(ty, desc, scope) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: obo::Ident::from(ty).into_owl(ctx),
+                    subject: owl::Individual::from(ty.into_owl(ctx)),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -116,10 +116,9 @@ impl IntoOwlCtx for obo::HeaderClause {
                     ap: ctx
                         .build
                         .annotation_property(property::obo_in_owl::HAS_DEFAULT_NAMESPACE),
-                    av: owl::AnnotationValue::Literal(owl::Literal {
-                        datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                        literal: Some(ns.to_string()),
-                        lang: None,
+                    av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
+                        datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                        literal: ns.to_string(),
                     }),
                 }),
             )),

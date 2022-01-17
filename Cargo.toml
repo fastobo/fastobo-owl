@@ -1,7 +1,7 @@
 [package]
 name = "fastobo-owl"
 version = "0.1.0"
-authors = ["Martin Larralde <martin.larralde@ens-cachan.fr>"]
+authors = ["Martin Larralde <martin.larralde@embl.de>"]
 edition = "2018"
 license = "MIT"
 readme = "README.md"
@@ -19,14 +19,15 @@ repository = "fastobo/fastobo-owl"
 status     = "actively-developed"
 
 [dependencies]
-fastobo = "0.9.0"
-horned-owl = "0.6.0"
-horned-functional = "0.1.2"
+fastobo = "0.13.0"
+horned-owl = "0.10.0"
+horned-functional = "0.2.0"
 failure = "0.1.5"
 curie = "0.0.8"
 either = "1.5.2"
 lazy_static = "1.3.0"
 ureq = "1.0"
+url = "2.2.2"
 
 [dev-dependencies]
 curie = "0.0.8"

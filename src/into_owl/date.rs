@@ -11,10 +11,9 @@ macro_rules! date_impl {
         impl IntoOwlCtx for $type {
             type Owl = owl::Literal;
             fn into_owl(self, ctx: &mut Context) -> Self::Owl {
-                owl::Literal {
-                    datatype_iri: Some(ctx.build.iri(datatype::xsd::DATETIME)),
-                    literal: Some(self.to_xsd_datetime()),
-                    lang: None,
+                owl::Literal::Datatype {
+                    datatype_iri: ctx.build.iri(datatype::xsd::DATETIME),
+                    literal: self.to_xsd_datetime(),
                 }
             }
         }

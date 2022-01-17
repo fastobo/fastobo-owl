@@ -23,7 +23,7 @@ impl IntoOwlCtx for obo::Synonym {
         );
 
         let axiom = owl::AnnotationAssertion {
-            subject: ctx.current_frame.clone(),
+            subject: owl::Individual::from(&ctx.current_frame),
             ann: owl::Annotation {
                 ap: ctx.build.annotation_property(uri),
                 av: d.into_owl(ctx).into(),

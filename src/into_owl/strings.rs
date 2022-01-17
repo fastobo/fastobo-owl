@@ -10,10 +10,9 @@ macro_rules! string_impl {
         impl IntoOwlCtx for $type {
             type Owl = owl::Literal;
             fn into_owl(self, ctx: &mut Context) -> Self::Owl {
-                owl::Literal {
-                    datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                    literal: Some(self.into_string()),
-                    lang: None,
+                owl::Literal::Datatype {
+                    datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                    literal: self.into_string(),
                 }
             }
         }

@@ -9,12 +9,12 @@ impl IntoOwlCtx for obo::PrefixedIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         let iri = match ctx.idspaces.get(self.prefix()) {
-            Some(url) => format!("{}{}", url, self.local().as_str()),
+            Some(url) => format!("{}{}", url, self.local()),
             None => format!(
                 "{}{}_{}",
                 crate::constants::uri::OBO,
-                self.prefix().as_str(),
-                self.local().as_str()
+                self.prefix(),
+                self.local(),
             ),
         };
         ctx.build.iri(iri)
@@ -34,7 +34,7 @@ impl IntoOwlCtx for obo::UnprefixedIdent {
 impl IntoOwlCtx for obo::Url {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
-        ctx.build.iri(self.into_string())
+        ctx.build.iri(self.as_str())
     }
 }
 
@@ -71,6 +71,14 @@ impl IntoOwlCtx for obo::RelationIdent {
 
 /// Convert a subset identifier to an OWL IRI.
 impl IntoOwlCtx for obo::SubsetIdent {
+    type Owl = owl::IRI;
+    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+        obo::Ident::from(self).into_owl(ctx)
+    }
+}
+
+/// Convert a subset identifier to an OWL IRI.
+impl IntoOwlCtx for obo::SynonymTypeIdent {
     type Owl = owl::IRI;
     fn into_owl(self, ctx: &mut Context) -> Self::Owl {
         obo::Ident::from(self).into_owl(ctx)

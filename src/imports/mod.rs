@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::io::BufReader;
+use std::ops::Deref;
 use std::path::Path;
 
 use fastobo::ast as obo;
@@ -25,7 +26,7 @@ impl ImportProvider for FoundryProvider {
     fn import(&mut self, import: &obo::Import) -> Result<ImportData, String> {
         // use URL or use default OBO Foundry URL
         let url = match import {
-            obo::Import::Url(url) => url.clone(),
+            obo::Import::Url(url) => *url.clone(),
             obo::Import::Abbreviated(id) => {
                 let s = format!("http://purl.obolibrary.org/obo/{}.obo", id);
                 obo::Url::parse(&s).expect("invalid import")
@@ -37,7 +38,8 @@ impl ImportProvider for FoundryProvider {
         let mut buf = BufReader::new(res.into_reader());
 
         // parse the OBO file if it is a correct OBO file.
-        let mut data = match Path::new(url.path()).extension() {
+        let resource = url.as_str().rsplit('/').next().unwrap();
+        let mut data = match Path::new(resource).extension() {
             Some(x) if x == "obo" => {
                 let mut doc = fastobo::from_reader(&mut buf)
                     .expect("could not parse OBO document");
@@ -96,7 +98,7 @@ impl From<obo::OboDoc> for ImportData {
         // extract imports
         for clause in doc.header().iter() {
             if let obo::HeaderClause::Import(import) = clause {
-                imports.insert(import.clone());
+                imports.insert(import.deref().clone());
             }
         }
 

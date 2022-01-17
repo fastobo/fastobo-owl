@@ -1,4 +1,5 @@
 mod date;
+mod def;
 mod doc;
 mod header;
 mod id;
@@ -12,9 +13,11 @@ mod xref;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::ops::Deref;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::ontology::set::SetOntology;
 
 use crate::constants::uri;
 
@@ -41,7 +44,7 @@ pub trait IntoOwl {
     /// See also: [`horned_owl::io::writer::write`](https://docs.rs/horned-owl/latest/horned_owl/io/writer/fn.write.html).
     fn prefixes(&self) -> curie::PrefixMapping;
     /// Convert the OBO document into an `Ontology` in OWL language.
-    fn into_owl(self) -> owl::Ontology;
+    fn into_owl(self) -> SetOntology;
 }
 
 // ---------------------------------------------------------------------------
@@ -86,8 +89,22 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn find_shorthand(frame: &obo::TypedefFrame) -> Option<obo::Ident> {
-        None
+    pub fn find_shorthand(frame: &obo::TypedefFrame) -> Option<&obo::Ident> {
+        if let obo::Ident::Unprefixed(old_id) = frame.id().as_inner().as_ref() {
+            // FIXME: right now this takes the first xref of a typedef,
+            //        assuming there is only one, but priority rules from
+            //        the OBO 1.4 specs should be implemented.
+            frame.iter().find_map(|c| match c.as_inner() {
+                obo::TypedefClause::Xref(x) => match x.id() {
+                    i @ obo::Ident::Prefixed(_) => Some(i),
+                    i @ obo::Ident::Url(_) => Some(i),
+                    _ => None,
+                },
+                _ => None,
+            })
+        } else {
+            None
+        }
     }
 
     pub fn is_class_level(&mut self, rid: &owl::IRI) -> bool {
@@ -215,7 +232,7 @@ impl Context {
         if self.is_class_level(&r_iri) {
             owl::ClassExpression::ObjectHasValue {
                 ope: owl::ObjectPropertyExpression::ObjectProperty(r_iri.into()),
-                i: owl::NamedIndividual::from(c_iri),
+                i: owl::Individual::Named(owl::NamedIndividual::from(c_iri)),
             }
         } else {
             owl::ClassExpression::ObjectSomeValuesFrom {
@@ -248,7 +265,7 @@ impl From<&obo::OboDoc> for Context {
         for clause in doc.header() {
             match clause {
                 obo::HeaderClause::Idspace(prefix, url, _) => {
-                    idspaces.insert(prefix.clone(), url.clone());
+                    idspaces.insert(prefix.deref().clone(), url.deref().clone());
                 }
                 obo::HeaderClause::Ontology(id) => {
                     ontology = Some(id.to_string());
@@ -264,7 +281,7 @@ impl From<&obo::OboDoc> for Context {
                 let id = typedef.id().as_ref().as_ref();
                 if let obo::Ident::Unprefixed(unprefixed) = id {
                     if let Some(short) = Context::find_shorthand(typedef) {
-                        shorthands.insert(id.clone(), short.clone());
+                        shorthands.insert(unprefixed.deref().clone(), short.clone());
                     }
                 }
             }
@@ -273,9 +290,9 @@ impl From<&obo::OboDoc> for Context {
         // Create the conversion context.
         let build: horned_owl::model::Build = Default::default();
         let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
-        let current_frame = build.iri(ontology_iri.clone().into_string());
+        let current_frame = build.iri(ontology_iri.as_str().to_string());
         let class_level = Default::default(); // TODO: extract annotation properties
-        let shorthands = Default::default(); // TODO: extract shorthands
+        //let shorthands = Default::default(); // TODO: extract shorthands
 
         Context {
             build,

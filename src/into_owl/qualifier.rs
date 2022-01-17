@@ -34,10 +34,9 @@ impl IntoOwlCtx for obo::Qualifier {
             // Build the annotation.
             Some(owl::Annotation {
                 ap: key.into_owl(ctx).into(),
-                av: owl::AnnotationValue::Literal(owl::Literal {
-                    lang: None,
-                    datatype_iri: Some(ctx.build.iri(datatype::xsd::STRING)),
-                    literal: Some(value.into_string()),
+                av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
+                    datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                    literal: value.into_string(),
                 }),
             })
         } else {
