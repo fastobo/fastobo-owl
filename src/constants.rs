@@ -64,6 +64,7 @@ pub mod property {
         pub const SAVED_BY: &str = concat!(oboInOwl!(), "savedBy");
         pub const SUBSET_PROPERTY: &str = concat!(oboInOwl!(), "SubsetProperty");
         pub const SYNONYM_TYPE_PROPERTY: &str = concat!(oboInOwl!(), "SynonymTypeProperty");
+        pub const IS_CYCLIC: &str = concat!(oboInOwl!(), "isCyclic");
 
         pub const HAS_BROAD_SYNONYM: &str = concat!(oboInOwl!(), "hasBroadSynonym");
         pub const HAS_EXACT_SYNONYM: &str = concat!(oboInOwl!(), "hasExactSynonym");
@@ -95,5 +96,6 @@ pub mod property {
         pub const DEFINITION: &str = concat!(obo!(), "IAO_0000115");
         pub const EXPAND_EXPRESSION_TO: &str = concat!(obo!(), "IAO_0000424");
         pub const EXPAND_ASSERTION_TO: &str = concat!(obo!(), "IAO_0000425");
+        pub const IS_ANTI_SYMETRIC: &str = concat!(obo!(), "IAO_0000427");
     }
 }
