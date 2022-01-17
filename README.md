@@ -2,7 +2,7 @@
 
 *OWL language mapping for ontologies in the OBO flat file format 1.4*
 
-[![TravisCI](https://img.shields.io/travis/fastobo/fastobo-owl/master.svg?maxAge=600&style=flat-square)](https://travis-ci.org/fastobo/fastobo-owl/branches)
+[![Actions](https://img.shields.io/github/workflow/status/fastobo/fastobo-owl/Test?style=flat-square&maxAge=600)](https://github.com/fastobo/fastobo-owl/actions)
 [![Codecov](https://img.shields.io/codecov/c/gh/fastobo/fastobo-owl/master.svg?style=flat-square&maxAge=600)](https://codecov.io/gh/fastobo/fastobo-owl)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square&maxAge=2678400)](https://choosealicense.com/licenses/mit/)
 [![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=2678400&style=flat-square)](https://github.com/fastobo/fastobo-owl/)
@@ -17,11 +17,16 @@
 
 ## See also
 
+* [`fastobo-syntax`](https://crates.io/crates/fastobo-syntax): Standalone `pest` parser
+  for the OBO format version 1.4.
 * [`fastobo`](https://crates.io/crates/fastobo): Abstract Syntax Tree and data
   structures for the OBO format version 1.4.
 * [`fastobo-py`](https://pypi.org/project/fastobo/): Idiomatic Python bindings
   to the `fastobo` crate.
-
+* [`fastobo-graphs`](https://crates.io/crates/fastobo-graphs): Data model and `serde`
+  implementation of the OBO graphs specification, with conversion traits from and to OBO.
+* [`fastobo-validator`](https://crates.io/crates/fastobo-validator): Standalone CLI
+  to validate OBO files against the specification.
 
 ## Feedback
 
@@ -42,4 +47,3 @@ as part of a Master's Degree internship in the [BBOP team](http://berkeleybop.or
 *Larralde M.* **Developing Python and Rust libraries to improve the ontology ecosystem**
 *\[version 1; not peer reviewed\].* F1000Research 2019, 8(ISCB Comm J):1500 (poster)
 ([https://doi.org/10.7490/f1000research.1117405.1](https://doi.org/10.7490/f1000research.1117405.1))
-
