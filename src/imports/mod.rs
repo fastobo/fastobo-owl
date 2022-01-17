@@ -19,57 +19,58 @@ pub trait ImportProvider {
 
 // ---------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
-pub struct FoundryProvider {}
-
-impl ImportProvider for FoundryProvider {
-    fn import(&mut self, import: &obo::Import) -> Result<ImportData, String> {
-        // use URL or use default OBO Foundry URL
-        let url = match import {
-            obo::Import::Url(url) => *url.clone(),
-            obo::Import::Abbreviated(id) => {
-                let s = format!("http://purl.obolibrary.org/obo/{}.obo", id);
-                obo::Url::parse(&s).expect("invalid import")
-            }
-        };
-
-        // get the imported document
-        let res = ureq::get(url.as_str()).redirects(10).call();
-        let mut buf = BufReader::new(res.into_reader());
-
-        // parse the OBO file if it is a correct OBO file.
-        let resource = url.as_str().rsplit('/').next().unwrap();
-        let mut data = match Path::new(resource).extension() {
-            Some(x) if x == "obo" => {
-                let mut doc = fastobo::from_reader(&mut buf).expect("could not parse OBO document");
-                doc.treat_xrefs();
-                ImportData::from(doc)
-            }
-            Some(x) if x == "owl" => {
-                return Err(String::from("cannot import OWL now"));
-            }
-            other => {
-                return Err(format!("unknown import extension: {:?}", other));
-            }
-        };
-
-        // process all imports
-        let mut imports = data.imports.clone();
-        while let Some(i) = hashset_take_arbitrary(&mut imports) {
-            // import the import in the document and add them to the `ImportData`.
-            let import_data = self.import(&i)?;
-            data.imports.extend(import_data.imports);
-            data.annotation_properties
-                .extend(import_data.annotation_properties);
-        }
-
-        Ok(data)
-    }
-}
+// WIP: Retrieve imports from the OBO Foundry.
+//
+// #[derive(Debug, Default)]
+// pub struct FoundryProvider {}
+//
+// impl ImportProvider for FoundryProvider {
+//     fn import(&mut self, import: &obo::Import) -> Result<ImportData, String> {
+//         // use URL or use default OBO Foundry URL
+//         let url = match import {
+//             obo::Import::Url(url) => *url.clone(),
+//             obo::Import::Abbreviated(id) => {
+//                 let s = format!("http://purl.obolibrary.org/obo/{}.obo", id);
+//                 obo::Url::parse(&s).expect("invalid import")
+//             }
+//         };
+//
+//         // get the imported document
+//         let res = ureq::get(url.as_str()).redirects(10).call();
+//         let mut buf = BufReader::new(res.into_reader());
+//
+//         // parse the OBO file if it is a correct OBO file.
+//         let resource = url.as_str().rsplit('/').next().unwrap();
+//         let mut data = match Path::new(resource).extension() {
+//             Some(x) if x == "obo" => {
+//                 let mut doc = fastobo::from_reader(&mut buf).expect("could not parse OBO document");
+//                 doc.treat_xrefs();
+//                 ImportData::from(doc)
+//             }
+//             Some(x) if x == "owl" => {
+//                 return Err(String::from("cannot import OWL now"));
+//             }
+//             other => {
+//                 return Err(format!("unknown import extension: {:?}", other));
+//             }
+//         };
+//
+//         // process all imports
+//         let mut imports = data.imports.clone();
+//         while let Some(i) = hashset_take_arbitrary(&mut imports) {
+//             // import the import in the document and add them to the `ImportData`.
+//             let import_data = self.import(&i)?;
+//             data.imports.extend(import_data.imports);
+//             data.annotation_properties
+//                 .extend(import_data.annotation_properties);
+//         }
+//
+//         Ok(data)
+//     }
+// }
 
 // ---------------------------------------------------------------------------
 
-/// The minimal data that
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct ImportData {
     // Needed to check no class-level relationship is used in an
