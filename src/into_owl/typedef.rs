@@ -311,8 +311,34 @@ impl IntoOwlCtx for obo::TypedefClause {
                     },
                 }))
             }
-            // obo::TypedefClause::ExpandAssertionTo(QuotedString, XrefList),
-            // obo::TypedefClause::ExpandExpressionTo(QuotedString, XrefList),
+            obo::TypedefClause::ExpandAssertionTo(template, xrefs) => {
+                Some(owl::AnnotatedAxiom::new(
+                    owl::AnnotationAssertion {
+                        subject: owl::Individual::from(&ctx.current_frame),
+                        ann: owl::Annotation {
+                            ap: ctx
+                                .build
+                                .annotation_property(property::iao::EXPAND_ASSERTION_TO),
+                            av: template.into_owl(ctx).into(),
+                        },
+                    },
+                    xrefs.into_owl(ctx),
+                ))
+            }
+            obo::TypedefClause::ExpandExpressionTo(template, xrefs) => {
+                Some(owl::AnnotatedAxiom::new(
+                    owl::AnnotationAssertion {
+                        subject: owl::Individual::from(&ctx.current_frame),
+                        ann: owl::Annotation {
+                            ap: ctx
+                                .build
+                                .annotation_property(property::iao::EXPAND_EXPRESSION_TO),
+                            av: template.into_owl(ctx).into(),
+                        },
+                    },
+                    xrefs.into_owl(ctx),
+                ))
+            }
             obo::TypedefClause::IsMetadataTag(_) => None,
             obo::TypedefClause::IsClassLevel(_) => None,
             _ => unimplemented!("{}", &self),

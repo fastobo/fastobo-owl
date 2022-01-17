@@ -93,5 +93,7 @@ pub mod property {
     pub mod iao {
         pub const REPLACED_BY: &str = concat!(obo!(), "IAO_0100001");
         pub const DEFINITION: &str = concat!(obo!(), "IAO_0000115");
+        pub const EXPAND_EXPRESSION_TO: &str = concat!(obo!(), "IAO_0000424");
+        pub const EXPAND_ASSERTION_TO: &str = concat!(obo!(), "IAO_0000425");
     }
 }
