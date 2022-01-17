@@ -21,7 +21,7 @@ impl IntoOwlCtx for obo::OboDoc {
 
         // Convert the header frame: most frames end up as Ontology annotations,
         // but some of hem require extra axioms.
-        let header = std::mem::replace(self.header_mut(), Default::default());
+        let header = std::mem::take(self.header_mut());
         for axiom in header.into_owl(ctx).into_iter() {
             ont.insert(axiom);
         }
@@ -41,8 +41,7 @@ impl IntoOwlCtx for obo::OboDoc {
                         ont.insert(axiom);
                     }
                 }
-                // _ => unimplemented!(),
-                _ => (),
+                _ => (), // Individuals are ignored
             };
         }
 
@@ -63,10 +62,9 @@ impl IntoOwl for obo::OboDoc {
     }
 
     fn into_owl(mut self) -> SetOntology {
+        // Assign default namespaces to entities missing one.
+        self.assign_namespaces(); // ignore errors
         // Process the xref header macros.
-        // Assigning the default namespace is not needed since we are only
-        // processing the current document, so there should be no namespace
-        // collision.
         self.treat_xrefs();
 
         // Extract conversion context from the document.
