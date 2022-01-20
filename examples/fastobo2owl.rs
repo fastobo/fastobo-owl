@@ -4,6 +4,7 @@ extern crate fastobo_owl;
 extern crate horned_owl;
 
 use fastobo_owl::IntoOwl;
+use horned_owl::ontology::set::SetOntology;
 
 fn main() {
     for arg in std::env::args().skip(1) {
@@ -17,7 +18,7 @@ fn main() {
 
         // Convert to OWL
         let prefixes = obodoc.prefixes();
-        let owldoc = obodoc.into_owl().unwrap().into();
+        let owldoc = obodoc.into_owl::<SetOntology>().unwrap().into();
 
         // Write it back
         let file = std::fs::File::create(path.with_extension("owl")).unwrap();

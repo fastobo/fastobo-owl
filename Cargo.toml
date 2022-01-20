@@ -36,6 +36,6 @@ default-features = false
 [dev-dependencies]
 pretty_assertions = "1.0.0"
 
-[[bin]]
+[[example]]
 name = "fastobo2owl"
-path = "bin/fastobo2owl.rs"
+path = "examples/fastobo2owl.rs"
