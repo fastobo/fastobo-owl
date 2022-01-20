@@ -14,7 +14,6 @@ pub mod constants;
 mod error;
 mod imports;
 mod into_owl;
-mod utils;
 
 pub use error::Error;
 pub use error::Result;

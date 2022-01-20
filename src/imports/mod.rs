@@ -7,7 +7,6 @@ use horned_owl::model as owl;
 
 use super::into_owl::Context;
 use super::into_owl::IntoOwlCtx;
-// use super::utils::hashset_take_arbitrary;
 
 // ---------------------------------------------------------------------------
 
@@ -55,7 +54,7 @@ pub trait ImportProvider {
 //
 //         // process all imports
 //         let mut imports = data.imports.clone();
-//         while let Some(i) = hashset_take_arbitrary(&mut imports) {
+//         for i in imports.drain() {
 //             // import the import in the document and add them to the `ImportData`.
 //             let import_data = self.import(&i)?;
 //             data.imports.extend(import_data.imports);

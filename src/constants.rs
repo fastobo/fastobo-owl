@@ -20,6 +20,7 @@ uris! {
 }
 
 // --- Base URIs -------------------------------------------------------------
+
 pub mod uri {
     pub const DC: &str = dc!();
     pub const OBO: &str = obo!();
