@@ -20,6 +20,7 @@ use horned_owl::model as owl;
 use horned_owl::ontology::set::SetOntology;
 
 use crate::constants::uri;
+use crate::error::Error;
 
 // ---------------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ pub trait IntoOwl {
     /// See also: [`horned_owl::io::writer::write`](https://docs.rs/horned-owl/latest/horned_owl/io/writer/fn.write.html).
     fn prefixes(&self) -> curie::PrefixMapping;
     /// Convert the OBO document into an `Ontology` in OWL language.
-    fn into_owl(self) -> SetOntology;
+    fn into_owl(self) -> Result<SetOntology, Error>;
 }
 
 // ---------------------------------------------------------------------------
@@ -255,15 +256,15 @@ impl From<&obo::OboDoc> for Context {
         let mut idspaces = HashMap::new();
         idspaces.insert(
             obo::IdentPrefix::new("BFO"),
-            obo::Url::parse(&format!("{}BFO_", uri::OBO,)).unwrap(),
+            obo::Url::new(format!("{}BFO_", uri::OBO,)).unwrap(),
         );
         idspaces.insert(
             obo::IdentPrefix::new("RO"),
-            obo::Url::parse(&format!("{}RO", uri::OBO,)).unwrap(),
+            obo::Url::new(format!("{}RO", uri::OBO,)).unwrap(),
         );
         idspaces.insert(
             obo::IdentPrefix::new("xsd"),
-            obo::Url::parse(uri::XSD).unwrap(),
+            obo::Url::new(uri::XSD).unwrap(),
         );
 
         // Add the prefixes and ID spaces from the OBO header.
@@ -297,7 +298,7 @@ impl From<&obo::OboDoc> for Context {
 
         // Create the conversion context.
         let build: horned_owl::model::Build = Default::default();
-        let ontology_iri = obo::Url::parse(&format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
+        let ontology_iri = obo::Url::new(format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
         let current_frame = build.iri(ontology_iri.as_str().to_string());
         let mut ctx = Context {
             build,

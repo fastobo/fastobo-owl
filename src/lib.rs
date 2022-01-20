@@ -1,16 +1,23 @@
+#![doc = include_str!("../README.md")]
 #![warn(clippy::all)]
+
+#[macro_use]
+extern crate lazy_static;
+#[macro_use]
+extern crate thiserror;
 
 extern crate curie;
 extern crate fastobo;
 extern crate horned_owl;
-#[macro_use]
-extern crate lazy_static;
 
 pub mod constants;
+mod error;
 mod imports;
 mod into_owl;
 mod utils;
 
+pub use error::Error;
+pub use error::Result;
 pub use imports::ImportData;
 pub use into_owl::IntoOwl;
 

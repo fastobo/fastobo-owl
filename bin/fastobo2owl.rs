@@ -17,7 +17,7 @@ fn main() {
 
         // Convert to OWL
         let prefixes = obodoc.prefixes();
-        let owldoc = obodoc.into_owl().into();
+        let owldoc = obodoc.into_owl().unwrap().into();
 
         // Write it back
         let file = std::fs::File::create(path.with_extension("owl")).unwrap();

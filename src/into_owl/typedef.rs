@@ -177,7 +177,6 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::Builtin(_) => None,
 
             obo::TypedefClause::HoldsOverChain(r1, r2) => {
-                // holds_over_chain(Rel1-ID Rel2-ID Qualifiers) 	SubObjectPropertyOf(T(Qualifiers) ObjectPropertyChain( T(Rel1-ID) T(Rel2-ID) ) T(Rel-ID) )
                 Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
                     sup: owl::ObjectPropertyExpression::from(&ctx.current_frame),
                     sub: owl::SubObjectPropertyExpression::ObjectPropertyChain(vec![

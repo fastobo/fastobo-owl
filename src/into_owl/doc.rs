@@ -8,6 +8,7 @@ use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
 use crate::constants::uri;
+use crate::error::Error;
 
 impl IntoOwlCtx for obo::OboDoc {
     type Owl = SetOntology;
@@ -71,9 +72,9 @@ impl IntoOwl for obo::OboDoc {
         mapping
     }
 
-    fn into_owl(mut self) -> SetOntology {
+    fn into_owl(mut self) -> Result<SetOntology, Error> {
         // Assign default namespaces to entities missing one.
-        self.assign_namespaces().ok(); // ignore errors
+        self.assign_namespaces()?; // ignore errors
 
         // Process the xref header macros.
         self.treat_xrefs();
@@ -91,6 +92,6 @@ impl IntoOwl for obo::OboDoc {
         // }
 
         // Return the converted document.
-        <Self as IntoOwlCtx>::into_owl(self, &mut ctx)
+        Ok(<Self as IntoOwlCtx>::into_owl(self, &mut ctx))
     }
 }
