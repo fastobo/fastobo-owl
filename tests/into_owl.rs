@@ -6,6 +6,7 @@ extern crate pretty_assertions;
 use std::path::PathBuf;
 
 use fastobo_owl::IntoOwl;
+use horned_owl::ontology::set::SetOntology;
 use pretty_assertions::assert_eq;
 
 macro_rules! converttest {
@@ -26,7 +27,7 @@ macro_rules! converttest {
             // Parse the OBO doc and convert it to OWL.
             let obo_doc = fastobo::from_file(&input_path).expect("could not parse input file");
             let actual = obo_doc
-                .into_owl()
+                .into_owl::<SetOntology>()
                 .expect("could not convert ontology to OWL");
 
             // horned_owl::io::writer::write(&mut std::io::stdout(), &actual, Some(&PREFIXES));

@@ -17,6 +17,7 @@ pub enum Error {
     /// ```rust
     /// # use std::str::FromStr;
     /// # use fastobo::ast::*;
+    /// # use horned_owl::ontology::set::SetOntology;
     /// use fastobo_owl::IntoOwl;
     ///
     /// let mut frame = TermFrame::new(ClassIdent::from(PrefixedIdent::new("TST", "001")));
@@ -24,7 +25,7 @@ pub enum Error {
     /// frame.push(Line::from(TermClause::UnionOf(id)));
     ///
     /// let doc = OboDoc::with_entities(vec![EntityFrame::from(frame)]);
-    /// let res = doc.into_owl();
+    /// let res = doc.into_owl::<SetOntology>();
     /// assert!(matches!(res, Err(fastobo_owl::Error::Cardinality(_))));
     /// ```
     #[error(transparent)]

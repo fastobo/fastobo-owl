@@ -19,7 +19,6 @@ use fastobo::ast as obo;
 use horned_owl::model as owl;
 use horned_owl::model::MutableOntology;
 use horned_owl::model::Ontology;
-use horned_owl::ontology::set::SetOntology;
 
 use crate::constants::uri;
 use crate::error::Error;

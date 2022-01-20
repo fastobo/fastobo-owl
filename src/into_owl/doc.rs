@@ -2,7 +2,6 @@ use fastobo::ast as obo;
 use fastobo::semantics::Identified;
 use horned_owl::model::MutableOntology;
 use horned_owl::model::Ontology;
-use horned_owl::ontology::set::SetOntology;
 
 use super::Context;
 use super::IntoOwl;

@@ -30,10 +30,15 @@ manifest:
 fastobo-owl = "0.1"
 ```
 
-Then use the `IntoOwl` trait to convert an [`OboDoc`](https://docs.rs/fastobo/latest/fastobo/ast/struct.OboDoc.html)
-into a [`SetOntology`](https://docs.rs/horned-owl/latest/horned_owl/ontology/set/struct.SetOntology.html).
+Then use the `IntoOwl` trait to convert an [`OboDoc`] into any OWL ontology
+(the output type must implement the [`Default`], [`Ontology`] and [`MutableOntology`] traits).
 Here's a how you could write a very simple script to load an OBO document
 from a file, convert it to OWL, and write it to another file in OWL/XML syntax:
+
+[`OboDoc`]: https://docs.rs/fastobo/latest/fastobo/ast/struct.OboDoc.html
+[`Default`]: https://doc.rust-lang.org/std/default/trait.Default.html
+[`Ontology`]: https://docs.rs/horned-owl/latest/horned_owl/model/trait.Ontology.html
+[`MutableOntology`]: https://docs.rs/horned-owl/latest/horned_owl/model/trait.MutableOntology.html
 
 ```rust
 extern crate fastobo;
@@ -48,9 +53,9 @@ let obo = fastobo::from_file("tests/data/ms.obo").expect("failed to read OBO fil
 // to build abbreviated IRIs when serializing the OWL output
 let prefixes = obo.prefixes();
 
-// convert the ontology to OBO
+// convert the ontology to OBO (the ontology type is implied by the later
+// call to owx::writer::write which expects an `AxiomMappedOntology`)
 let owl = obo.into_owl()
-  .map(horned_owl::ontology::axiom_mapped::AxiomMappedOntology::from)
   .expect("failed to convert OBO to OWL");
 
 // write the OWL ontology with abbreviated IRIs

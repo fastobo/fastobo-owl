@@ -10,6 +10,7 @@ homepage = "https://github.com/fastobo/fastobo-owl"
 description = "OWL language mapping for ontologies in the OBO flat file format 1.4"
 keywords = ["obo", "ontology", "obofoundry", "owl", "semantics"]
 categories = ["science"]
+exclude = ["tests/data/*"]
 
 [badges.travis-ci]
 repository = "fastobo/fastobo-owl"
