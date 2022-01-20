@@ -17,6 +17,8 @@ use std::ops::Deref;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::model::MutableOntology;
+use horned_owl::model::Ontology;
 use horned_owl::ontology::set::SetOntology;
 
 use crate::constants::uri;
@@ -45,7 +47,9 @@ pub trait IntoOwl {
     /// See also: [`horned_owl::io::writer::write`](https://docs.rs/horned-owl/latest/horned_owl/io/writer/fn.write.html).
     fn prefixes(&self) -> curie::PrefixMapping;
     /// Convert the OBO document into an `Ontology` in OWL language.
-    fn into_owl(self) -> Result<SetOntology, Error>;
+    fn into_owl<O>(self) -> Result<O, Error>
+    where
+        O: Default + Ontology + MutableOntology;
 }
 
 // ---------------------------------------------------------------------------
