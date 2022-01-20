@@ -2,6 +2,8 @@
 # Created by https://www.gitignore.io/api/rust,python
 # Edit at https://www.gitignore.io/?templates=rust,python
 
+tests/data/ms.owx
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

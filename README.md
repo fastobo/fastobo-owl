@@ -15,6 +15,49 @@
 
 ## Overview
 
+This library provides an implementation of the [OBO to OWL mappings](http://owlcollab.github.io/oboformat/doc/obo-syntax.html#5)
+for the [OBO format version 1.4](https://owlcollab.github.io/oboformat/doc/GO.format.obo-1_4.html) ontology language.
+It can be used to produce a semantically-equivalent OWL ontology from any
+OBO ontology.
+
+
+## Usage
+
+Add `fastobo-owl` to the `[dependencies]` sections of your `Cargo.toml`
+manifest:
+```toml
+[dependencies]
+fastobo-owl = "0.1"
+```
+
+Then use the `IntoOwl` trait to convert an [`OboDoc`](https://docs.rs/fastobo/latest/fastobo/ast/struct.OboDoc.html)
+into a [`SetOntology`](https://docs.rs/horned-owl/latest/horned_owl/ontology/set/struct.SetOntology.html).
+Here's a how you could write a very simple script to load an OBO document
+from a file, convert it to OWL, and write it to another file in OWL/XML syntax:
+
+```rust
+extern crate fastobo;
+extern crate fastobo_owl;
+
+use fastobo_owl::IntoOwl;
+
+// load an OBO ontology from a file
+let obo = fastobo::from_file("tests/data/ms.obo").expect("failed to read OBO file");
+
+// extract prefixes from the OBO header, so that they can be used
+// to build abbreviated IRIs when serializing the OWL output
+let prefixes = obo.prefixes();
+
+// convert the ontology to OBO
+let owl = obo.into_owl()
+  .map(horned_owl::ontology::axiom_mapped::AxiomMappedOntology::from)
+  .expect("failed to convert OBO to OWL");
+
+// write the OWL ontology with abbreviated IRIs
+let mut output = std::fs::File::create("tests/data/ms.owx").unwrap();
+horned_owl::io::owx::writer::write(&mut output, &owl, Some(&prefixes));
+```
+
 ## See also
 
 * [`fastobo-syntax`](https://crates.io/crates/fastobo-syntax): Standalone `pest` parser
