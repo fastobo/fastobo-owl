@@ -39,6 +39,7 @@ pub mod datatype {
     pub mod xsd {
         pub const STRING: &str = concat!(xsd!(), "string");
         pub const BOOLEAN: &str = concat!(xsd!(), "boolean");
+        pub const DATE: &str = concat!(xsd!(), "date");
         pub const DATETIME: &str = concat!(xsd!(), "dateTime");
     }
 }
