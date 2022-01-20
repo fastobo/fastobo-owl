@@ -15,14 +15,17 @@ pub enum Error {
     ///
     /// # Example:
     /// ```rust
+    /// # use std::str::FromStr;
     /// # use fastobo::ast::*;
+    /// use fastobo_owl::IntoOwl;
     ///
-    /// let id = ClassIdent::from_str("MS:1000031").unwrap();
-    /// let mut frame = TermFrame::new();
-    /// frame.push(TermClause::UnionOf(Box::new(id)));
+    /// let mut frame = TermFrame::new(ClassIdent::from(PrefixedIdent::new("TST", "001")));
+    /// let id = Box::new(ClassIdent::from(PrefixedIdent::new("TST", "002")));
+    /// frame.push(Line::from(TermClause::UnionOf(id)));
     ///
-    /// let res = OboDoc::with_entities(frame).into_owl();
-    /// assert!(matches!(res, Err(fastobo::error::Error::Cardinality(_))));
+    /// let doc = OboDoc::with_entities(vec![EntityFrame::from(frame)]);
+    /// let res = doc.into_owl();
+    /// assert!(matches!(res, Err(fastobo_owl::Error::Cardinality(_))));
     /// ```
     #[error(transparent)]
     Cardinality(#[from] CardinalityError),
