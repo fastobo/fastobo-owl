@@ -74,7 +74,8 @@ impl IntoOwl for obo::OboDoc {
     fn into_owl(mut self) -> SetOntology {
         // Assign default namespaces to entities missing one.
         self.assign_namespaces().ok(); // ignore errors
-                                       // Process the xref header macros.
+
+        // Process the xref header macros.
         self.treat_xrefs();
 
         // Extract conversion context from the document.
