@@ -3,3 +3,4 @@ ontology: tst
 [Term]
 id: TST:01
 def: "definition" [] {comment="a comment"}
+namespace: test

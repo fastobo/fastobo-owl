@@ -1,6 +1,7 @@
 format-version: 1.4
 created-by: Martin Larralde
 ontology: tst
+default-namespace: test
 
 [Term]
 id: TST:001

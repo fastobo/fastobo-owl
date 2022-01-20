@@ -8,6 +8,10 @@
     <AnnotationProperty IRI="oboInOwl:hasOBOFormatVersion"/>
     <Literal datatypeIRI="xsd:string">1.4</Literal>
   </Annotation>
+  <Annotation>
+    <AnnotationProperty IRI="oboInOwl:hasDefaultNamespace"/>
+    <Literal datatypeIRI="xsd:string">test</Literal>
+  </Annotation>
   <Declaration>
       <Class IRI="http://purl.obolibrary.org/obo/TST_001"/>
   </Declaration>
@@ -31,5 +35,17 @@
     <Class IRI="http://purl.obolibrary.org/obo/TST_001"/>
     <Class IRI="http://purl.obolibrary.org/obo/TST_002"/>
   </EquivalentClasses>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_001</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_002</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
 
 </Ontology>

@@ -176,8 +176,7 @@ impl IntoOwlCtx for obo::TermClause {
                         ap: ctx
                             .build
                             .annotation_property(property::obo_in_owl::HAS_OBO_NAMESPACE),
-                        av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                            datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                        av: owl::AnnotationValue::Literal(owl::Literal::Simple {
                             literal: ns.to_string(),
                         }),
                     },
@@ -191,8 +190,7 @@ impl IntoOwlCtx for obo::TermClause {
                         ap: ctx
                             .build
                             .annotation_property(property::obo_in_owl::HAS_ALTERNATIVE_ID),
-                        av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                            datatype_iri: ctx.build.iri(datatype::xsd::STRING),
+                        av: owl::AnnotationValue::Literal(owl::Literal::Simple {
                             literal: id.to_string(),
                         }),
                     },

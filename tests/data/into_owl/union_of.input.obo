@@ -5,3 +5,4 @@ id: TST:01
 union_of: TST:02
 union_of: TST:03
 union_of: TST:04
+namespace: test

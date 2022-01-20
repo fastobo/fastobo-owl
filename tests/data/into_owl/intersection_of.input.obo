@@ -1,4 +1,5 @@
 ontology: tst
+default-namespace: test
 
 [Term]
 id: TST:01

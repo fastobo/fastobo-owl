@@ -24,4 +24,10 @@
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">Proteomics Standards Initiative Mass Spectrometry Vocabularies.</Literal>
   </AnnotationAssertion>
 
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:MS_0000000</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">MS</Literal>
+  </AnnotationAssertion>
+
 </Ontology>

@@ -4,6 +4,10 @@
   <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
   <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
   <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+  <Annotation>
+    <AnnotationProperty IRI="oboInOwl:hasDefaultNamespace"/>
+    <Literal datatypeIRI="xsd:string">test</Literal>
+  </Annotation>
   <Declaration>
       <Class IRI="http://purl.obolibrary.org/obo/TST_01"/>
   </Declaration>
@@ -63,5 +67,23 @@
       </ObjectSomeValuesFrom>
     </ObjectIntersectionOf>
   </EquivalentClasses>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_02</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_03</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
 
 </Ontology>

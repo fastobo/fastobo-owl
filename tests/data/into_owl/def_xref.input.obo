@@ -3,3 +3,4 @@ ontology: ms
 [Term]
 id: MS:0000000
 def: "Proteomics Standards Initiative Mass Spectrometry Vocabularies." [PSI:MS]
+namespace: MS

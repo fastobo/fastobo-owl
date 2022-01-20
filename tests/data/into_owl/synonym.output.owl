@@ -56,4 +56,11 @@
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">something exact</Literal>
   </AnnotationAssertion>
 
+  <!-- translation of TST:01 namespace -->
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
+
 </Ontology>

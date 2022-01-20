@@ -46,4 +46,12 @@
         <NamedIndividual abbreviatedIRI="http://purl.obolibrary.org/obo/TST_01"/>
         <AbbreviatedIRI>obo:tst#goslim_mouse</AbbreviatedIRI>
     </AnnotationAssertion>
+
+    <!-- Translation of TST:01 namespace -->
+    <AnnotationAssertion>
+      <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+      <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+      <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+    </AnnotationAssertion>
+
 </Ontology>

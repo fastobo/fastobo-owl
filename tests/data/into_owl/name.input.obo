@@ -5,3 +5,4 @@ ontology: tst
 [Term]
 id: TST:001
 name: test item
+namespace: test

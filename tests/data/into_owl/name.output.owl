@@ -24,5 +24,10 @@
     <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test item</Literal>
   </AnnotationAssertion>
 
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_001</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
 
 </Ontology>
