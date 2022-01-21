@@ -31,7 +31,7 @@ features = ["threading"]
 version = "0.10.0"
 default-features = false
 [dependencies.horned-functional]
-version = "0.3.1"
+version = "0.3.2"
 default-features = false
 
 [dev-dependencies]
