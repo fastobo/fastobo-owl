@@ -13,9 +13,11 @@ mod xref;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::convert::TryFrom;
 use std::ops::Deref;
 
 use fastobo::ast as obo;
+use fastobo::error::CardinalityError;
 use horned_owl::model as owl;
 use horned_owl::model::MutableOntology;
 use horned_owl::model::Ontology;
@@ -67,6 +69,7 @@ lazy_static! {
 }
 
 /// An opaque structure to pass context arguments required for OWL conversion.
+#[derive(Debug)]
 pub struct Context {
     /// The `horned_owl::model::Build` to create reference counted IRI.
     pub build: owl::Build,
@@ -99,6 +102,101 @@ pub struct Context {
 }
 
 impl Context {
+    pub fn from_obodoc(doc: &obo::OboDoc) -> Result<Self, Error> {
+        // Add the ID spaces declared implicitly in the document.
+        let mut idspaces = HashMap::new();
+        idspaces.insert(
+            obo::IdentPrefix::new("BFO"),
+            obo::Url::new(format!("{}BFO_", uri::OBO,)).unwrap(),
+        );
+        idspaces.insert(
+            obo::IdentPrefix::new("RO"),
+            obo::Url::new(format!("{}RO", uri::OBO,)).unwrap(),
+        );
+        idspaces.insert(
+            obo::IdentPrefix::new("xsd"),
+            obo::Url::new(uri::XSD).unwrap(),
+        );
+
+        // Add the prefixes and ID spaces from the OBO header.
+        let mut ontology = Err(Error::Cardinality(CardinalityError::MissingClause {
+            name: String::from("ontology"),
+        }));
+        for clause in doc.header() {
+            match clause {
+                obo::HeaderClause::Idspace(prefix, url, _) => {
+                    idspaces.insert(prefix.deref().clone(), url.deref().clone());
+                }
+                obo::HeaderClause::Ontology(id) => {
+                    ontology = Ok(id.to_string());
+                }
+                _ => (),
+            }
+        }
+
+        // Add the shorthands from the OBO typdef
+        let mut shorthands = HashMap::new();
+        for frame in doc
+            .entities()
+            .iter()
+            .flat_map(obo::EntityFrame::as_typedef_frame)
+        {
+            let id = frame.id().as_ref().as_ref();
+            if let obo::Ident::Unprefixed(unprefixed) = id {
+                if let Some(short) = Context::find_shorthand(frame) {
+                    shorthands.insert(unprefixed.deref().clone(), short.clone());
+                }
+            }
+        }
+
+        // Create the conversion context.
+        let build: horned_owl::model::Build = Default::default();
+        let ontology_iri = obo::Url::new(format!("{}{}", uri::OBO, ontology?))?;
+        let current_frame = build.iri(ontology_iri.as_str().to_string());
+        let mut ctx = Context {
+            build,
+            idspaces,
+            ontology_iri,
+            current_frame,
+            shorthands,
+            metadata_tag: Default::default(),
+            class_level: Default::default(),
+            in_annotation: false,
+        };
+
+        // Retrieve class-level relationships and annotation properties
+        //
+        // NB: this is done after the context is created because we need to
+        //     perform OBO ID to IRI conversion for the typedefs, which
+        //     already requires a context (in case the typedef has a prefixed
+        //     identifier).
+        for frame in doc
+            .entities()
+            .iter()
+            .flat_map(obo::EntityFrame::as_typedef_frame)
+        {
+            let is_metadata_tag = frame.iter().any(|line| match line.as_inner() {
+                obo::TypedefClause::IsMetadataTag(true) => true,
+                _ => false,
+            });
+            let is_class_level = frame.iter().any(|line| match line.as_inner() {
+                obo::TypedefClause::IsClassLevel(true) => true,
+                _ => false,
+            });
+            if is_metadata_tag || is_class_level {
+                let iri = frame.id().as_ref().clone().into_owl(&mut ctx);
+                if is_class_level {
+                    ctx.class_level.insert(iri.clone());
+                }
+                if is_metadata_tag {
+                    ctx.metadata_tag.insert(iri.clone());
+                }
+            }
+        }
+
+        Ok(ctx)
+    }
+
     pub fn find_shorthand(frame: &obo::TypedefFrame) -> Option<&obo::Ident> {
         if let obo::Ident::Unprefixed(_) = frame.id().as_inner().as_ref() {
             // FIXME: right now this takes the first xref of a typedef,
@@ -253,97 +351,9 @@ impl Context {
     }
 }
 
-impl From<&obo::OboDoc> for Context {
-    fn from(doc: &obo::OboDoc) -> Self {
-        // Add the ID spaces declared implicitly in the document.
-        let mut idspaces = HashMap::new();
-        idspaces.insert(
-            obo::IdentPrefix::new("BFO"),
-            obo::Url::new(format!("{}BFO_", uri::OBO,)).unwrap(),
-        );
-        idspaces.insert(
-            obo::IdentPrefix::new("RO"),
-            obo::Url::new(format!("{}RO", uri::OBO,)).unwrap(),
-        );
-        idspaces.insert(
-            obo::IdentPrefix::new("xsd"),
-            obo::Url::new(uri::XSD).unwrap(),
-        );
-
-        // Add the prefixes and ID spaces from the OBO header.
-        let mut ontology = None;
-        for clause in doc.header() {
-            match clause {
-                obo::HeaderClause::Idspace(prefix, url, _) => {
-                    idspaces.insert(prefix.deref().clone(), url.deref().clone());
-                }
-                obo::HeaderClause::Ontology(id) => {
-                    ontology = Some(id.to_string());
-                }
-                _ => (),
-            }
-        }
-
-        // Add the shorthands from the OBO typdef
-        let mut shorthands = HashMap::new();
-        for frame in doc
-            .entities()
-            .iter()
-            .flat_map(obo::EntityFrame::as_typedef_frame)
-        {
-            let id = frame.id().as_ref().as_ref();
-            if let obo::Ident::Unprefixed(unprefixed) = id {
-                if let Some(short) = Context::find_shorthand(frame) {
-                    shorthands.insert(unprefixed.deref().clone(), short.clone());
-                }
-            }
-        }
-
-        // Create the conversion context.
-        let build: horned_owl::model::Build = Default::default();
-        let ontology_iri = obo::Url::new(format!("{}{}", uri::OBO, ontology.unwrap())).unwrap(); // FIXME
-        let current_frame = build.iri(ontology_iri.as_str().to_string());
-        let mut ctx = Context {
-            build,
-            idspaces,
-            ontology_iri,
-            current_frame,
-            shorthands,
-            metadata_tag: Default::default(),
-            class_level: Default::default(),
-            in_annotation: false,
-        };
-
-        // Retrieve class-level relationships and annotation properties
-        //
-        // NB: this is done after the context is created because we need to
-        //     perform OBO ID to IRI conversion for the typedefs, which
-        //     already requires a context (in case the typedef has a prefixed
-        //     identifier).
-        for frame in doc
-            .entities()
-            .iter()
-            .flat_map(obo::EntityFrame::as_typedef_frame)
-        {
-            let is_metadata_tag = frame.iter().any(|line| match line.as_inner() {
-                obo::TypedefClause::IsMetadataTag(true) => true,
-                _ => false,
-            });
-            let is_class_level = frame.iter().any(|line| match line.as_inner() {
-                obo::TypedefClause::IsClassLevel(true) => true,
-                _ => false,
-            });
-            if is_metadata_tag || is_class_level {
-                let iri = frame.id().as_ref().clone().into_owl(&mut ctx);
-                if is_class_level {
-                    ctx.class_level.insert(iri.clone());
-                }
-                if is_metadata_tag {
-                    ctx.metadata_tag.insert(iri.clone());
-                }
-            }
-        }
-
-        ctx
+impl TryFrom<&obo::OboDoc> for Context {
+    type Error = Error;
+    fn try_from(doc: &obo::OboDoc) -> Result<Self, Error> {
+        Self::from_obodoc(doc)
     }
 }

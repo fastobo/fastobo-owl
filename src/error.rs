@@ -1,4 +1,5 @@
 use fastobo::error::CardinalityError;
+use fastobo::error::SyntaxError;
 
 /// The result type for this crate.
 pub type Result<T> = std::result::Result<T, Error>;
@@ -30,4 +31,13 @@ pub enum Error {
     /// ```
     #[error(transparent)]
     Cardinality(#[from] CardinalityError),
+
+    #[error(transparent)]
+    /// An error caused by an element in invalid syntax.
+    ///
+    /// This can be raised while building IRI and Version IRI for an OWL
+    /// ontology from an OBO `ontology` header clause, which may contain
+    /// invalid data.
+    ///
+    Syntax(#[from] SyntaxError),
 }

@@ -31,7 +31,7 @@ impl IntoOwl for obo::OboDoc {
         self.treat_xrefs();
 
         // Extract conversion context from the document.
-        let mut ctx = Context::from(&self);
+        let mut ctx = Context::from_obodoc(&self)?;
 
         // Create the output ontology
         let mut ont = O::default();
