@@ -5,7 +5,7 @@ use fastobo::error::SyntaxError;
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// The error type for this crate.
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq)]
 pub enum Error {
     /// An error caused by a clause appearing an invalid number of times.
     ///

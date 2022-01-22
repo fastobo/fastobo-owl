@@ -119,16 +119,17 @@ impl Context {
         );
 
         // Add the prefixes and ID spaces from the OBO header.
-        let mut ontology = Err(Error::Cardinality(CardinalityError::MissingClause {
-            name: String::from("ontology"),
-        }));
+        let mut ontology = Err(Error::Cardinality(CardinalityError::missing("ontology")));
         for clause in doc.header() {
             match clause {
                 obo::HeaderClause::Idspace(prefix, url, _) => {
                     idspaces.insert(prefix.deref().clone(), url.deref().clone());
                 }
-                obo::HeaderClause::Ontology(id) => {
+                obo::HeaderClause::Ontology(id) if ontology.is_err() => {
                     ontology = Ok(id.to_string());
+                }
+                obo::HeaderClause::Ontology(_) if ontology.is_ok() => {
+                    return Err(Error::Cardinality(CardinalityError::duplicate("ontology")));
                 }
                 _ => (),
             }
@@ -355,5 +356,40 @@ impl TryFrom<&obo::OboDoc> for Context {
     type Error = Error;
     fn try_from(doc: &obo::OboDoc) -> Result<Self, Error> {
         Self::from_obodoc(doc)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn missing_ontology_clause() {
+        let doc = obo::OboDoc::new();
+        let res = Context::from_obodoc(&doc);
+        assert!(matches!(
+            res,
+            Err(Error::Cardinality(CardinalityError::MissingClause { .. }))
+        ));
+    }
+
+    #[test]
+    fn duplicate_ontology_clause() {
+        let mut doc = obo::OboDoc::new();
+        doc.header_mut().push(obo::HeaderClause::Ontology(Box::new(
+            obo::UnquotedString::new("test1"),
+        )));
+        doc.header_mut().push(obo::HeaderClause::Ontology(Box::new(
+            obo::UnquotedString::new("test2"),
+        )));
+
+        let res = Context::from_obodoc(&doc);
+        assert!(matches!(
+            res,
+            Err(Error::Cardinality(
+                CardinalityError::DuplicateClauses { .. }
+            ))
+        ));
     }
 }
