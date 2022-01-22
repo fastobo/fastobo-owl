@@ -27,7 +27,7 @@ Add `fastobo-owl` to the `[dependencies]` sections of your `Cargo.toml`
 manifest:
 ```toml
 [dependencies]
-fastobo-owl = "0.1.1"
+fastobo-owl = "0.1.2"
 ```
 
 Then use the `IntoOwl` trait to convert an [`OboDoc`] into any OWL ontology
@@ -51,6 +51,7 @@ let obo = fastobo::from_file("tests/data/ms.obo").expect("failed to read OBO fil
 
 // extract prefixes from the OBO header, so that they can be used
 // to build abbreviated IRIs when serializing the OWL output
+// (note: this contains OBO default prefixes such as xsd, rdf, or oboInOwl)
 let prefixes = obo.prefixes();
 
 // convert the ontology to OBO (the ontology type is implied by the later

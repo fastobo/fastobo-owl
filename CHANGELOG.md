@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.1.2...HEAD
+
+
+## [v0.1.2] - 2022-01-22
+
+[v0.1.2]: https://github.com/fastobo/fastobo-owl/compare/v0.1.1...v0.1.2
+
+### Added
+- `Syntax` variant to the `Error` enum returned when an invalid URL was created in `IntoOwl`.
+
+### Fixed
+- Uncaught panic when converting an `OboDoc` missing an `ontology` header clause.
+
+### Changed
+- Detect duplicate `ontology` header clause when converting an `OboDoc`.
 
 
 ## [v0.1.1] - 2022-01-20
