@@ -12,12 +12,10 @@ extern crate horned_owl;
 
 pub mod constants;
 mod error;
-mod imports;
 mod into_owl;
 
 pub use error::Error;
 pub use error::Result;
-pub use imports::ImportData;
 pub use into_owl::IntoOwl;
 
 // ---------------------------------------------------------------------------
