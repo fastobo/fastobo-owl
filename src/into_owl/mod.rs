@@ -111,7 +111,7 @@ impl Context {
         );
         idspaces.insert(
             obo::IdentPrefix::new("RO"),
-            obo::Url::new(format!("{}RO", uri::OBO,)).unwrap(),
+            obo::Url::new(format!("{}RO_", uri::OBO,)).unwrap(),
         );
         idspaces.insert(
             obo::IdentPrefix::new("xsd"),
