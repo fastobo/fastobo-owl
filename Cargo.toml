@@ -28,14 +28,14 @@ version = "0.14.0"
 default-features = false
 features = ["threading"]
 [dependencies.horned-owl]
-version = "0.10.1-alpha"
+# version = "0.10.1-alpha"
 git = 'https://github.com/phillord/horned-owl'
 branch = 'devel'
 default-features = false
 [dependencies.horned-functional]
-version = "0.3.2"
+# version = "0.3.2"
+git = 'https://github.com/fastobo/horned-functional'
 default-features = false
-path = "../horned-functional"
 
 [dev-dependencies]
 pretty_assertions = "1.0.0"
