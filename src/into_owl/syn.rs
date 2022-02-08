@@ -10,7 +10,7 @@ impl IntoOwlCtx for obo::Synonym {
     fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
         // Build the main assertion
         let axiom = owl::AnnotationAssertion {
-            subject: owl::Individual::from(&ctx.current_frame),
+            subject: owl::AnnotationSubject::from(&ctx.current_frame),
             ann: owl::Annotation {
                 ap: owl::AnnotationProperty::from(self.scope().into_owl(ctx)),
                 av: std::mem::take(self.description_mut()).into_owl(ctx).into(),

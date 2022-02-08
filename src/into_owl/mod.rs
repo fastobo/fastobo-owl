@@ -217,11 +217,11 @@ impl Context {
     }
 
     pub fn is_class_level(&mut self, rid: &owl::IRI) -> bool {
-        self.class_level.contains(&rid)
+        self.class_level.contains(rid)
     }
 
     pub fn is_metadata_tag(&mut self, rid: &owl::IRI) -> bool {
-        self.metadata_tag.contains(&rid)
+        self.metadata_tag.contains(rid)
     }
 
     pub fn rel_class_expression(

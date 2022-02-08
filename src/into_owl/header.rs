@@ -79,7 +79,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                     ),
                 }),
                 owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(subset.into_owl(ctx)),
+                    subject: owl::AnnotationSubject::from(subset.into_owl(ctx)),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::rdfs::LABEL),
                         av: owl::AnnotationValue::Literal(owl::Literal::Simple {
@@ -88,7 +88,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                     },
                 }),
                 owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(subset.into_owl(ctx)),
+                    subject: owl::AnnotationSubject::from(subset.into_owl(ctx)),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::rdfs::COMMENT),
                         av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
@@ -114,7 +114,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                         ),
                     }),
                     owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                        subject: owl::Individual::from(ty.into_owl(ctx)),
+                        subject: owl::AnnotationSubject::from(ty.into_owl(ctx)),
                         ann: owl::Annotation {
                             ap: ctx.build.annotation_property(property::rdfs::LABEL),
                             av: owl::AnnotationValue::Literal(desc.into_owl(ctx)),
@@ -123,7 +123,7 @@ impl IntoOwlCtx for obo::HeaderClause {
                 ];
                 if let Some(scope) = optscope {
                     axioms.push(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                        subject: owl::Individual::from(ty.into_owl(ctx)),
+                        subject: owl::AnnotationSubject::from(ty.into_owl(ctx)),
                         ann: owl::Annotation {
                             ap: ctx
                                 .build

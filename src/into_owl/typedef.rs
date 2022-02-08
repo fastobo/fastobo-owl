@@ -43,7 +43,7 @@ impl IntoOwlCtx for obo::TypedefFrame {
 
         // Add the original OBO ID as an annotation.
         axioms.insert(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-            subject: owl::Individual::from(&id),
+            subject: owl::AnnotationSubject::from(&id),
             ann: owl::Annotation {
                 ap: ctx.build.annotation_property(property::obo_in_owl::ID),
                 av: owl::AnnotationValue::Literal(owl::Literal::Simple {
@@ -75,7 +75,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::Name(name) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::rdfs::LABEL),
                         av: name.into_owl(ctx).into(),
@@ -85,7 +85,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::Namespace(ns) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -99,7 +99,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::AltId(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -115,7 +115,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::Comment(comment) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::rdfs::COMMENT),
                         av: comment.into_owl(ctx).into(),
@@ -125,7 +125,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::Subset(subset) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -144,7 +144,7 @@ impl IntoOwlCtx for obo::TypedefClause {
                 });
                 Some(owl::AnnotatedAxiom::new(
                     owl::Axiom::from(owl::AnnotationAssertion {
-                        subject: owl::Individual::from(&ctx.current_frame),
+                        subject: owl::AnnotationSubject::from(&ctx.current_frame),
                         ann: xref.into_owl(ctx),
                     }),
                     BTreeSet::from_iter(annotation),
@@ -153,7 +153,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::PropertyValue(pv) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: pv.into_owl(ctx),
                 }))
             }
@@ -187,7 +187,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::IsAntiSymmetric(false) => None,
             obo::TypedefClause::IsAntiSymmetric(true) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -203,7 +203,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::IsCyclic(false) => None,
             obo::TypedefClause::IsCyclic(true) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -384,7 +384,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::Relationship(rid, target) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: owl::AnnotationProperty::from(rid.into_owl(ctx)),
                         av: owl::AnnotationValue::IRI(target.into_owl(ctx)),
@@ -394,7 +394,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::IsObsolete(b) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::owl::DEPRECATED),
                         av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
@@ -407,7 +407,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::ReplacedBy(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::iao::REPLACED_BY),
                         av: owl::AnnotationValue::IRI(id.into_owl(ctx)),
@@ -417,7 +417,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::Consider(id) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
                             .build
@@ -429,7 +429,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::CreatedBy(c) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::dc::CREATOR),
                         av: c.into_owl(ctx).into(),
@@ -439,7 +439,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::CreationDate(dt) => {
                 Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
-                    subject: owl::Individual::from(&ctx.current_frame),
+                    subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::dc::DATE),
                         av: dt.into_owl(ctx).into(),
@@ -450,7 +450,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::ExpandAssertionTo(template, xrefs) => {
                 Some(owl::AnnotatedAxiom::new(
                     owl::AnnotationAssertion {
-                        subject: owl::Individual::from(&ctx.current_frame),
+                        subject: owl::AnnotationSubject::from(&ctx.current_frame),
                         ann: owl::Annotation {
                             ap: ctx
                                 .build
@@ -465,7 +465,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::ExpandExpressionTo(template, xrefs) => {
                 Some(owl::AnnotatedAxiom::new(
                     owl::AnnotationAssertion {
-                        subject: owl::Individual::from(&ctx.current_frame),
+                        subject: owl::AnnotationSubject::from(&ctx.current_frame),
                         ann: owl::Annotation {
                             ap: ctx
                                 .build

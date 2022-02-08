@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#">
+  <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
+  <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
+  <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+  <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+  <Declaration>
+      <Class IRI="http://purl.obolibrary.org/obo/TST_01"/>
+  </Declaration>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">TST:01</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty IRI="http://purl.org/dc/elements/1.1/creator"/>
+    <AbbreviatedIRI>obo:TST_01</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">Martin Larralde</Literal>
+  </AnnotationAssertion>
+
+</Ontology>

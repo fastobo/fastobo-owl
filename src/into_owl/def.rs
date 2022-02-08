@@ -11,7 +11,7 @@ impl IntoOwlCtx for obo::Definition {
         let xrefs = std::mem::take(self.xrefs_mut());
         owl::AnnotatedAxiom::new(
             owl::AnnotationAssertion::new(
-                owl::Individual::from(&ctx.current_frame),
+                owl::AnnotationSubject::from(&ctx.current_frame),
                 owl::Annotation {
                     ap: ctx.build.annotation_property(property::iao::DEFINITION),
                     av: owl::AnnotationValue::Literal(owl::Literal::Simple {

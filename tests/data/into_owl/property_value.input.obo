@@ -1,0 +1,6 @@
+ontology: tst
+
+[Term]
+id: TST:01
+property_value: http://purl.org/dc/elements/1.1/creator "Martin Larralde" xsd:string
+namespace: test

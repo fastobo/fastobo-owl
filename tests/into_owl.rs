@@ -56,6 +56,7 @@ converttest!(header);
 converttest!(intersection_of);
 converttest!(is_a);
 converttest!(name);
+converttest!(property_value);
 converttest!(qualifier);
 converttest!(subsetdef);
 converttest!(synonym);

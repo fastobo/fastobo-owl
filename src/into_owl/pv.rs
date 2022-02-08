@@ -3,6 +3,21 @@ use horned_owl::model as owl;
 
 use super::Context;
 use super::IntoOwlCtx;
+use crate::constants::datatype::xsd;
+
+fn is_xsd_string(ctx: &Context, id: &obo::Ident) -> bool {
+    match id {
+        obo::Ident::Unprefixed(_) => false,
+        obo::Ident::Url(url) => url.as_str() == xsd::STRING,
+        obo::Ident::Prefixed(pid) => match ctx.idspaces.get(pid.prefix()) {
+            None => pid.prefix() == "xsd" && pid.local() == "string",
+            Some(base_url) => {
+                let url = format!("{}{}", base_url, pid.local());
+                url == xsd::STRING
+            }
+        },
+    }
+}
 
 impl IntoOwlCtx for obo::PropertyValue {
     type Owl = owl::Annotation;
@@ -14,9 +29,15 @@ impl IntoOwlCtx for obo::PropertyValue {
             },
             obo::PropertyValue::Literal(pv) => owl::Annotation {
                 ap: owl::AnnotationProperty(pv.property().into_owl(ctx)),
-                av: owl::AnnotationValue::Literal(owl::Literal::Datatype {
-                    datatype_iri: pv.datatype().into_owl(ctx),
-                    literal: pv.literal().to_string(),
+                av: owl::AnnotationValue::Literal(if is_xsd_string(&ctx, pv.datatype()) {
+                    owl::Literal::Simple {
+                        literal: pv.literal().as_str().to_string(),
+                    }
+                } else {
+                    owl::Literal::Datatype {
+                        datatype_iri: pv.datatype().into_owl(ctx),
+                        literal: pv.literal().as_str().to_string(),
+                    }
                 }),
             },
         }
