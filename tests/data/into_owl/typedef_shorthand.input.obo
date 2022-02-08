@@ -1,0 +1,6 @@
+ontology: tst
+
+[Typedef]
+id: has_role
+xref: RO:0000087
+namespace: test

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#">
+  <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
+  <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
+  <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+  <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+  <Declaration>
+      <ObjectProperty IRI="http://purl.obolibrary.org/obo/tst#has_role"/>
+  </Declaration>
+
+  <EquivalentObjectProperties>
+    <ObjectProperty IRI="http://purl.obolibrary.org/obo/tst#has_role"/>
+    <ObjectProperty IRI="http://purl.obolibrary.org/obo/RO_0000087"/>
+  </EquivalentObjectProperties>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasDbXref"/>
+    <AbbreviatedIRI>obo:tst#has_role</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">RO:0000087</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:hasOBONamespace"/>
+    <AbbreviatedIRI>obo:tst#has_role</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">test</Literal>
+  </AnnotationAssertion>
+
+  <AnnotationAssertion>
+    <AnnotationProperty abbreviatedIRI="oboInOwl:id"/>
+    <AbbreviatedIRI>obo:tst#has_role</AbbreviatedIRI>
+    <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">has_role</Literal>
+  </AnnotationAssertion>
+
+</Ontology>
