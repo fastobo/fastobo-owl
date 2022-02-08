@@ -20,12 +20,12 @@
     <!-- translation of subsetdef -->
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
-        <NamedIndividual IRI="http://purl.obolibrary.org/obo/tst#goslim_mouse"/>
+        <IRI>http://purl.obolibrary.org/obo/tst#goslim_mouse</IRI>
         <Literal>Mouse GO slim</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <NamedIndividual IRI="http://purl.obolibrary.org/obo/tst#goslim_mouse"/>
+        <IRI>http://purl.obolibrary.org/obo/tst#goslim_mouse</IRI>
         <Literal>goslim_mouse</Literal>
     </AnnotationAssertion>
     <SubAnnotationPropertyOf>
@@ -36,14 +36,14 @@
     <!-- Translation of TST:01 id -->
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://www.geneontology.org/formats/oboInOwl#id"/>
-        <NamedIndividual abbreviatedIRI="http://purl.obolibrary.org/obo/TST_01"/>
+        <AbbreviatedIRI>http://purl.obolibrary.org/obo/TST_01</AbbreviatedIRI>
         <Literal>TST:01</Literal>
     </AnnotationAssertion>
 
     <!-- Translation of TST:01 subset clause -->
     <AnnotationAssertion>
         <AnnotationProperty IRI="http://www.geneontology.org/formats/oboInOwl#inSubset"/>
-        <NamedIndividual abbreviatedIRI="http://purl.obolibrary.org/obo/TST_01"/>
+        <AbbreviatedIRI>http://purl.obolibrary.org/obo/TST_01</AbbreviatedIRI>
         <AbbreviatedIRI>obo:tst#goslim_mouse</AbbreviatedIRI>
     </AnnotationAssertion>
 

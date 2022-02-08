@@ -18,12 +18,12 @@
   </SubAnnotationPropertyOf>
   <AnnotationAssertion>
       <AnnotationProperty abbreviatedIRI="oboInOwl:hasScope"/>
-      <NamedIndividual abbreviatedIRI="obo:tst#systematic_synonym"/>
+      <AbbreviatedIRI>obo:tst#systematic_synonym</AbbreviatedIRI>
       <AbbreviatedIRI>oboInOwl:hasExactSynonym</AbbreviatedIRI>
   </AnnotationAssertion>
   <AnnotationAssertion>
       <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-      <NamedIndividual abbreviatedIRI="obo:tst#systematic_synonym"/>
+      <AbbreviatedIRI>obo:tst#systematic_synonym</AbbreviatedIRI>
       <Literal>Systematic synonym</Literal>
   </AnnotationAssertion>
 
