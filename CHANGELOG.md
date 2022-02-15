@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.2.0...HEAD
+
+
+## [v0.2.0] - 2022-01-15
+
+[v0.2.0]: https://github.com/fastobo/fastobo-owl/compare/v0.1.2...v0.2.0
+
+### Fixed
+- Wrong Relations Ontology IDspace in `::into_owl::Context::from_obodoc` default mapping.
+
+### Changed
+- Bump `horned-owl` to `v0.11.0`.
+- Bump `horned-functional` to `v0.4.0`.
 
 
 ## [v0.1.2] - 2022-01-22
