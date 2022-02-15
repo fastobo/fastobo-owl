@@ -137,11 +137,7 @@ impl Context {
 
         // Add the shorthands from the OBO typdef
         let mut shorthands = HashMap::new();
-        for frame in doc
-            .entities()
-            .iter()
-            .flat_map(obo::EntityFrame::as_typedef_frame)
-        {
+        for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef) {
             let id = frame.id().as_ref().as_ref();
             if let obo::Ident::Unprefixed(unprefixed) = id {
                 if let Some(short) = Context::find_shorthand(frame) {
@@ -171,11 +167,7 @@ impl Context {
         //     perform OBO ID to IRI conversion for the typedefs, which
         //     already requires a context (in case the typedef has a prefixed
         //     identifier).
-        for frame in doc
-            .entities()
-            .iter()
-            .flat_map(obo::EntityFrame::as_typedef_frame)
-        {
+        for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef) {
             let is_metadata_tag = frame.iter().any(|line| match line.as_inner() {
                 obo::TypedefClause::IsMetadataTag(true) => true,
                 _ => false,
