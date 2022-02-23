@@ -1,5 +1,7 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
+use horned_owl::model::Axiom;
+use horned_owl::model::Import;
 use horned_owl::model::MutableOntology;
 use horned_owl::model::Ontology;
 
@@ -57,6 +59,12 @@ impl IntoOwl for obo::OboDoc {
         for axiom in header.into_owl(&mut ctx).into_iter() {
             ont.insert(axiom);
         }
+
+        // force import of the oboInOwl ontology
+        ont.insert(Axiom::Import(Import(
+            ctx.build
+                .iri("http://www.geneontology.org/formats/oboInOwl"),
+        )));
 
         // Convert each entity to a set of OWL axioms that are then added to the ontology.
         let entities = std::mem::replace(self.entities_mut(), Default::default());
