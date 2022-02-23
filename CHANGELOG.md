@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.2.1...HEAD
+
+
+## [v0.2.1] - 2022-02-23
+
+[v0.2.1]: https://github.com/fastobo/fastobo-owl/compare/v0.2.0...v0.2.1
+
+### Fixed
+- Make the OWL document obtained from an OBO document import `oboInOwl`.
 
 
 ## [v0.2.0] - 2022-01-15

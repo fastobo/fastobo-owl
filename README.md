@@ -27,7 +27,7 @@ Add `fastobo-owl` to the `[dependencies]` sections of your `Cargo.toml`
 manifest:
 ```toml
 [dependencies]
-fastobo-owl = "0.2.0"
+fastobo-owl = "0.2.1"
 ```
 
 Then use the `IntoOwl` trait to convert an [`OboDoc`] into any OWL ontology
