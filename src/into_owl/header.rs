@@ -219,6 +219,8 @@ impl<A: ForIRI> IntoOwlCtx<A> for obo::HeaderFrame {
                     .ok(),
             };
             axioms.push(AnnotatedComponent::from(oid));
+        } else {
+            axioms.push(AnnotatedComponent::from(OntologyID::default()));
         }
 
         // Process the header frame clauses
