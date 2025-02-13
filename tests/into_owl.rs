@@ -64,3 +64,4 @@ converttest!(subsetdef);
 converttest!(synonym);
 converttest!(union_of);
 converttest!(typedef_shorthand);
+converttest!(version_iri);

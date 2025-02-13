@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#" ontologyIRI="http://purl.obolibrary.org/obo/tst.owl" versionIRI="http://purl.obolibrary.org/obo/tst/0.1.0/tst.owl">
+  <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
+  <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
+  <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+  <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+  <Import>http://www.geneontology.org/formats/oboInOwl</Import>
+</Ontology>

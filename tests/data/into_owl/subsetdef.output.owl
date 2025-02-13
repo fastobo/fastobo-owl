@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Ontology xmlns="http://www.w3.org/2002/07/owl#">
+<Ontology xmlns="http://www.w3.org/2002/07/owl#" ontologyIRI="http://purl.obolibrary.org/obo/tst.owl">
     <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
     <Prefix name="obo" IRI="http://purl.obolibrary.org/obo/"/>
     <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
