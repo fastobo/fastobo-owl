@@ -21,7 +21,6 @@ use fastobo::error::CardinalityError;
 use horned_owl::model as owl;
 use horned_owl::model::ForIRI;
 use horned_owl::model::MutableOntology;
-use horned_owl::model::Ontology;
 
 use crate::constants::uri;
 use crate::error::Error;
@@ -91,7 +90,9 @@ pub struct Context<A: ForIRI> {
     /// A flag to indicate the current frame is an annotation property.
     pub in_annotation: bool,
 
-    /// A mapping
+    /// A mapping of shorthands relationship names to their full identifier.
+    /// (e.g. `part_of` mapping to `BFO:0000050`)
+    #[allow(unused)]
     pub shorthands: HashMap<obo::UnprefixedIdent, obo::Ident>,
 
     /// A set of IRI which refer to class level relationships.

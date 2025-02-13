@@ -1,7 +1,6 @@
 use fastobo::ast as obo;
 use horned_owl::model as owl;
 use horned_owl::model::ForIRI;
-use horned_owl::ontology::set::SetOntology;
 
 use super::Context;
 use super::IntoOwlCtx;

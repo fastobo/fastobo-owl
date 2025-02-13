@@ -5,7 +5,6 @@ use horned_owl::model::Component;
 use horned_owl::model::ForIRI;
 use horned_owl::model::Import;
 use horned_owl::model::MutableOntology;
-use horned_owl::model::Ontology;
 use horned_owl::model::OntologyID;
 
 use super::Context;
