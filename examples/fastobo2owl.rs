@@ -3,7 +3,12 @@ extern crate fastobo;
 extern crate fastobo_owl;
 extern crate horned_owl;
 
+use std::rc::Rc;
+
 use fastobo_owl::IntoOwl;
+use fastobo_owl::IntoOwlPrefixes;
+use horned_owl::model::AnnotatedComponent;
+use horned_owl::ontology::component_mapped::ComponentMappedOntology;
 use horned_owl::ontology::set::SetOntology;
 
 fn main() {
@@ -18,7 +23,8 @@ fn main() {
 
         // Convert to OWL
         let prefixes = obodoc.prefixes();
-        let owldoc = obodoc.into_owl::<SetOntology>().unwrap().into();
+        let owldoc: ComponentMappedOntology<String, Rc<AnnotatedComponent<String>>> =
+            obodoc.into_owl::<SetOntology<String>>().unwrap().into();
 
         // Write it back
         let file = std::fs::File::create(path.with_extension("owl")).unwrap();

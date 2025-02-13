@@ -1,11 +1,12 @@
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::model::ForIRI;
 
 use super::Context;
 use super::IntoOwlCtx;
 use crate::constants::datatype::xsd;
 
-fn is_xsd_string(ctx: &Context, id: &obo::Ident) -> bool {
+fn is_xsd_string<A: ForIRI>(ctx: &Context<A>, id: &obo::Ident) -> bool {
     match id {
         obo::Ident::Unprefixed(_) => false,
         obo::Ident::Url(url) => url.as_str() == xsd::STRING,
@@ -19,9 +20,9 @@ fn is_xsd_string(ctx: &Context, id: &obo::Ident) -> bool {
     }
 }
 
-impl IntoOwlCtx for obo::PropertyValue {
-    type Owl = owl::Annotation;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::PropertyValue {
+    type Owl = owl::Annotation<A>;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl {
         match self {
             obo::PropertyValue::Resource(pv) => owl::Annotation {
                 ap: owl::AnnotationProperty(pv.property().into_owl(ctx)),

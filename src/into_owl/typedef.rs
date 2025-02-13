@@ -3,6 +3,7 @@ use std::iter::FromIterator;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::model::ForIRI;
 
 use super::Context;
 use super::IntoOwlCtx;
@@ -15,9 +16,9 @@ fn is_annotation_property(frame: &obo::TypedefFrame) -> bool {
         .any(|l| l.as_inner() == &obo::TypedefClause::IsMetadataTag(true))
 }
 
-impl IntoOwlCtx for obo::TypedefFrame {
-    type Owl = BTreeSet<owl::AnnotatedAxiom>;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::TypedefFrame {
+    type Owl = BTreeSet<owl::AnnotatedComponent<A>>;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl {
         // The ID of this frame translated to an IRI.
         let id = self.id().clone().into_inner().into_owl(ctx);
 
@@ -27,22 +28,24 @@ impl IntoOwlCtx for obo::TypedefFrame {
         // Check if we translate as object or annotation property.
         if is_annotation_property(&self) {
             // Annotation property.
-            axioms.insert(owl::AnnotatedAxiom {
+            axioms.insert(owl::AnnotatedComponent {
                 ann: BTreeSet::new(),
-                axiom: owl::Axiom::from(owl::DeclareAnnotationProperty(id.clone().into())),
+                component: owl::Component::<A>::from(owl::DeclareAnnotationProperty(
+                    id.clone().into(),
+                )),
             });
             ctx.in_annotation = true;
         } else {
             // Object property.
-            axioms.insert(owl::AnnotatedAxiom {
+            axioms.insert(owl::AnnotatedComponent {
                 ann: BTreeSet::new(),
-                axiom: owl::Axiom::from(owl::DeclareObjectProperty(id.clone().into())),
+                component: owl::Component::<A>::from(owl::DeclareObjectProperty(id.clone().into())),
             });
             ctx.in_annotation = false;
         }
 
         // Add the original OBO ID as an annotation.
-        axioms.insert(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+        axioms.insert(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
             subject: owl::AnnotationSubject::from(&id),
             ann: owl::Annotation {
                 ap: ctx.build.annotation_property(property::obo_in_owl::ID),
@@ -60,21 +63,21 @@ impl IntoOwlCtx for obo::TypedefFrame {
     }
 }
 
-impl IntoOwlCtx for obo::Line<obo::TypedefClause> {
-    type Owl = Option<owl::AnnotatedAxiom>;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::Line<obo::TypedefClause> {
+    type Owl = Option<owl::AnnotatedComponent<A>>;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl {
         self.into_inner().into_owl(ctx)
     }
 }
 
-impl IntoOwlCtx for obo::TypedefClause {
-    type Owl = Option<owl::AnnotatedAxiom>;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::TypedefClause {
+    type Owl = Option<owl::AnnotatedComponent<A>>;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl {
         match self {
             obo::TypedefClause::IsAnonymous(_) => None,
 
             obo::TypedefClause::Name(name) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::rdfs::LABEL),
@@ -84,7 +87,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::Namespace(ns) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
@@ -98,7 +101,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::AltId(id) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
@@ -114,7 +117,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::Def(def) => Some(def.into_owl(ctx)),
 
             obo::TypedefClause::Comment(comment) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::rdfs::COMMENT),
@@ -124,7 +127,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::Subset(subset) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
@@ -142,8 +145,8 @@ impl IntoOwlCtx for obo::TypedefClause {
                     ap: ctx.build.annotation_property(property::rdfs::LABEL),
                     av: desc.clone().into_owl(ctx).into(),
                 });
-                Some(owl::AnnotatedAxiom::new(
-                    owl::Axiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::new(
+                    owl::Component::from(owl::AnnotationAssertion {
                         subject: owl::AnnotationSubject::from(&ctx.current_frame),
                         ann: xref.into_owl(ctx),
                     }),
@@ -152,21 +155,21 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::PropertyValue(pv) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: pv.into_owl(ctx),
                 }))
             }
 
             obo::TypedefClause::Domain(cid) => {
-                Some(owl::AnnotatedAxiom::from(owl::ObjectPropertyDomain {
+                Some(owl::AnnotatedComponent::from(owl::ObjectPropertyDomain {
                     ope: owl::ObjectPropertyExpression::from(&ctx.current_frame),
                     ce: owl::ClassExpression::Class(owl::Class::from(cid.into_owl(ctx))),
                 }))
             }
 
             obo::TypedefClause::Range(cid) => {
-                Some(owl::AnnotatedAxiom::from(owl::ObjectPropertyRange {
+                Some(owl::AnnotatedComponent::from(owl::ObjectPropertyRange {
                     ope: owl::ObjectPropertyExpression::from(&ctx.current_frame),
                     ce: owl::ClassExpression::Class(owl::Class::from(cid.into_owl(ctx))),
                 }))
@@ -175,7 +178,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             obo::TypedefClause::Builtin(_) => None,
 
             obo::TypedefClause::HoldsOverChain(r1, r2) => {
-                Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
+                Some(owl::AnnotatedComponent::from(owl::SubObjectPropertyOf {
                     sup: owl::ObjectPropertyExpression::from(&ctx.current_frame),
                     sub: owl::SubObjectPropertyExpression::ObjectPropertyChain(vec![
                         owl::ObjectPropertyExpression::ObjectProperty(r1.into_owl(ctx).into()),
@@ -186,7 +189,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::IsAntiSymmetric(false) => None,
             obo::TypedefClause::IsAntiSymmetric(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
@@ -202,7 +205,7 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::IsCyclic(false) => None,
             obo::TypedefClause::IsCyclic(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
@@ -218,41 +221,41 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::IsReflexive(false) => None,
             obo::TypedefClause::IsReflexive(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::ReflexiveObjectProperty(
+                Some(owl::AnnotatedComponent::from(owl::ReflexiveObjectProperty(
                     owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into()),
                 )))
             }
 
             obo::TypedefClause::IsSymmetric(false) => None,
             obo::TypedefClause::IsSymmetric(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::SymmetricObjectProperty(
+                Some(owl::AnnotatedComponent::from(owl::SymmetricObjectProperty(
                     owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into()),
                 )))
             }
 
             obo::TypedefClause::IsAsymmetric(false) => None,
-            obo::TypedefClause::IsAsymmetric(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::AsymmetricObjectProperty(
-                    owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into()),
-                )))
-            }
+            obo::TypedefClause::IsAsymmetric(true) => Some(owl::AnnotatedComponent::from(
+                owl::AsymmetricObjectProperty(owl::ObjectPropertyExpression::ObjectProperty(
+                    ctx.current_frame.clone().into(),
+                )),
+            )),
 
             obo::TypedefClause::IsTransitive(false) => None,
-            obo::TypedefClause::IsTransitive(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::TransitiveObjectProperty(
-                    owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into()),
-                )))
-            }
+            obo::TypedefClause::IsTransitive(true) => Some(owl::AnnotatedComponent::from(
+                owl::TransitiveObjectProperty(owl::ObjectPropertyExpression::ObjectProperty(
+                    ctx.current_frame.clone().into(),
+                )),
+            )),
 
             obo::TypedefClause::IsFunctional(false) => None,
-            obo::TypedefClause::IsFunctional(true) => {
-                Some(owl::AnnotatedAxiom::from(owl::FunctionalObjectProperty(
-                    owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into()),
-                )))
-            }
+            obo::TypedefClause::IsFunctional(true) => Some(owl::AnnotatedComponent::from(
+                owl::FunctionalObjectProperty(owl::ObjectPropertyExpression::ObjectProperty(
+                    ctx.current_frame.clone().into(),
+                )),
+            )),
 
             obo::TypedefClause::IsInverseFunctional(false) => None,
-            obo::TypedefClause::IsInverseFunctional(true) => Some(owl::AnnotatedAxiom::from(
+            obo::TypedefClause::IsInverseFunctional(true) => Some(owl::AnnotatedComponent::from(
                 owl::InverseFunctionalObjectProperty(
                     owl::ObjectPropertyExpression::ObjectProperty(ctx.current_frame.clone().into()),
                 ),
@@ -260,12 +263,14 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::IsA(supercls) => {
                 if ctx.in_annotation {
-                    Some(owl::AnnotatedAxiom::from(owl::SubAnnotationPropertyOf {
-                        sup: supercls.into_owl(ctx).into(),
-                        sub: ctx.current_frame.clone().into(),
-                    }))
+                    Some(owl::AnnotatedComponent::from(
+                        owl::SubAnnotationPropertyOf {
+                            sup: supercls.into_owl(ctx).into(),
+                            sub: ctx.current_frame.clone().into(),
+                        },
+                    ))
                 } else {
-                    Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
+                    Some(owl::AnnotatedComponent::from(owl::SubObjectPropertyOf {
                         sup: owl::ObjectPropertyExpression::ObjectProperty(
                             supercls.into_owl(ctx).into(),
                         ),
@@ -283,7 +288,7 @@ impl IntoOwlCtx for obo::TypedefClause {
                 //        so the 1.4 guide recommends to just add the classes
                 //        as superclasses and add an additional annotation assertion,
                 //        but at the moment T(relation_intersection_of) is undefined.
-                Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
+                Some(owl::AnnotatedComponent::from(owl::SubObjectPropertyOf {
                     sup: owl::ObjectPropertyExpression::ObjectProperty(rid.into_owl(ctx).into()),
                     sub: owl::SubObjectPropertyExpression::ObjectPropertyExpression(
                         owl::ObjectPropertyExpression::from(&ctx.current_frame),
@@ -296,7 +301,7 @@ impl IntoOwlCtx for obo::TypedefClause {
                 //        so the 1.4 guide recommends to just add the classes
                 //        as subclasses and add an additional annotation assertion,
                 //        but at the moment T(relation_union_of) is undefined.
-                Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
+                Some(owl::AnnotatedComponent::from(owl::SubObjectPropertyOf {
                     sup: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty::from(
                         &ctx.current_frame,
                     )),
@@ -308,41 +313,44 @@ impl IntoOwlCtx for obo::TypedefClause {
 
             obo::TypedefClause::EquivalentTo(cls) => {
                 if ctx.in_annotation {
-                    Some(owl::AnnotatedAxiom::from(owl::EquivalentDataProperties(
-                        vec![ctx.current_frame.clone().into(), cls.into_owl(ctx).into()],
-                    )))
+                    Some(owl::AnnotatedComponent::from(
+                        owl::EquivalentDataProperties(vec![
+                            ctx.current_frame.clone().into(),
+                            cls.into_owl(ctx).into(),
+                        ]),
+                    ))
                 } else {
-                    Some(owl::AnnotatedAxiom::from(owl::EquivalentObjectProperties(
-                        vec![
+                    Some(owl::AnnotatedComponent::from(
+                        owl::EquivalentObjectProperties(vec![
                             owl::ObjectPropertyExpression::from(&ctx.current_frame),
                             owl::ObjectPropertyExpression::ObjectProperty(cls.into_owl(ctx).into()),
-                        ],
-                    )))
+                        ]),
+                    ))
                 }
             }
 
             obo::TypedefClause::DisjointFrom(rid) => {
                 if !ctx.in_annotation {
-                    Some(owl::AnnotatedAxiom::from(owl::DisjointObjectProperties(
-                        vec![
+                    Some(owl::AnnotatedComponent::from(
+                        owl::DisjointObjectProperties(vec![
                             owl::ObjectPropertyExpression::from(&ctx.current_frame),
                             owl::ObjectPropertyExpression::ObjectProperty(rid.into_owl(ctx).into()),
-                        ],
-                    )))
+                        ]),
+                    ))
                 } else {
                     None
                 }
             }
 
             obo::TypedefClause::InverseOf(rid) => {
-                Some(owl::AnnotatedAxiom::from(owl::InverseObjectProperties(
+                Some(owl::AnnotatedComponent::from(owl::InverseObjectProperties(
                     owl::ObjectProperty::from(&ctx.current_frame),
                     owl::ObjectProperty::from(rid.into_owl(ctx)),
                 )))
             }
 
             obo::TypedefClause::TransitiveOver(rid) => {
-                Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
+                Some(owl::AnnotatedComponent::from(owl::SubObjectPropertyOf {
                     sup: owl::ObjectPropertyExpression::from(&ctx.current_frame),
                     sub: owl::SubObjectPropertyExpression::ObjectPropertyChain(vec![
                         owl::ObjectPropertyExpression::from(&ctx.current_frame),
@@ -359,7 +367,7 @@ impl IntoOwlCtx for obo::TypedefClause {
                 //        recommends to just add the chain as a subclass
                 //        and add an additional annotation assertion, but at
                 //        the moment T(equivalent_to_chain) is undefined.
-                Some(owl::AnnotatedAxiom::from(owl::SubObjectPropertyOf {
+                Some(owl::AnnotatedComponent::from(owl::SubObjectPropertyOf {
                     sup: owl::ObjectPropertyExpression::ObjectProperty(owl::ObjectProperty::from(
                         &ctx.current_frame,
                     )),
@@ -383,7 +391,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::Relationship(rid, target) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: owl::AnnotationProperty::from(rid.into_owl(ctx)),
@@ -393,7 +401,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::IsObsolete(b) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::owl::DEPRECATED),
@@ -406,7 +414,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::ReplacedBy(id) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::iao::REPLACED_BY),
@@ -416,7 +424,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::Consider(id) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx
@@ -428,7 +436,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::CreatedBy(c) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::dc::CREATOR),
@@ -438,7 +446,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::CreationDate(dt) => {
-                Some(owl::AnnotatedAxiom::from(owl::AnnotationAssertion {
+                Some(owl::AnnotatedComponent::from(owl::AnnotationAssertion {
                     subject: owl::AnnotationSubject::from(&ctx.current_frame),
                     ann: owl::Annotation {
                         ap: ctx.build.annotation_property(property::dc::DATE),
@@ -448,7 +456,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::ExpandAssertionTo(template, xrefs) => {
-                Some(owl::AnnotatedAxiom::new(
+                Some(owl::AnnotatedComponent::new(
                     owl::AnnotationAssertion {
                         subject: owl::AnnotationSubject::from(&ctx.current_frame),
                         ann: owl::Annotation {
@@ -463,7 +471,7 @@ impl IntoOwlCtx for obo::TypedefClause {
             }
 
             obo::TypedefClause::ExpandExpressionTo(template, xrefs) => {
-                Some(owl::AnnotatedAxiom::new(
+                Some(owl::AnnotatedComponent::new(
                     owl::AnnotationAssertion {
                         subject: owl::AnnotationSubject::from(&ctx.current_frame),
                         ann: owl::Annotation {

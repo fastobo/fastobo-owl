@@ -1,17 +1,21 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
-use horned_owl::model::Axiom;
+use horned_owl::model::AnnotatedComponent;
+use horned_owl::model::Component;
+use horned_owl::model::ForIRI;
 use horned_owl::model::Import;
 use horned_owl::model::MutableOntology;
 use horned_owl::model::Ontology;
+use horned_owl::model::OntologyID;
 
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
+use super::IntoOwlPrefixes;
 use crate::constants::uri;
 use crate::error::Error;
 
-impl IntoOwl for obo::OboDoc {
+impl IntoOwlPrefixes for obo::OboDoc {
     fn prefixes(&self) -> curie::PrefixMapping {
         let mut mapping = crate::obo_prefixes();
         for clause in self.header() {
@@ -21,10 +25,12 @@ impl IntoOwl for obo::OboDoc {
         }
         mapping
     }
+}
 
+impl<A: ForIRI> IntoOwl<A> for obo::OboDoc {
     fn into_owl<O>(mut self) -> Result<O, Error>
     where
-        O: Default + Ontology + MutableOntology,
+        O: Default + MutableOntology<A>,
     {
         // Assign default namespaces to entities missing one.
         self.assign_namespaces()?; // ignore errors
@@ -39,19 +45,22 @@ impl IntoOwl for obo::OboDoc {
         let mut ont = O::default();
 
         // declare the IRI and Version IRI for the ontology.
-        if let Some(name) = self.header().iter().find_map(|c| match c {
-            obo::HeaderClause::Ontology(name) => Some(name),
-            _ => None,
-        }) {
-            // persistent URL
-            let url = format!("{}{}.owl", uri::OBO, name);
-            ont.mut_id().iri = Some(ctx.build.iri(url));
-            // version-specific URL
-            if let Ok(dv) = self.header().data_version() {
-                let url = format!("{}{}/{}/{}.owl", uri::OBO, name, dv, name);
-                ont.mut_id().viri = Some(ctx.build.iri(url));
+        let id = if let Ok(name) = self.header().ontology() {
+            OntologyID {
+                iri: Some(ctx.build.iri(format!("{}{}.owl", uri::OBO, name))),
+                viri: self
+                    .header()
+                    .data_version()
+                    .map(|dv| {
+                        ctx.build
+                            .iri(format!("{}{}/{}/{}.owl", uri::OBO, name, dv, name))
+                    })
+                    .ok(),
             }
-        }
+        } else {
+            OntologyID::default()
+        };
+        ont.insert(AnnotatedComponent::from(Component::OntologyID(id)));
 
         // Convert the header frame: most frames end up as Ontology annotations,
         // but some of them require extra axioms.
@@ -61,7 +70,7 @@ impl IntoOwl for obo::OboDoc {
         }
 
         // force import of the oboInOwl ontology
-        ont.insert(Axiom::Import(Import(
+        ont.insert(Component::Import(Import(
             ctx.build
                 .iri("http://www.geneontology.org/formats/oboInOwl"),
         )));

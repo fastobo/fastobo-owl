@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::model::ForIRI;
 
 use super::Context;
 use super::IntoOwlCtx;
@@ -34,9 +35,9 @@ lazy_static! {
     };
 }
 
-impl IntoOwlCtx for obo::Qualifier {
-    type Owl = Option<owl::Annotation>;
-    fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::Qualifier {
+    type Owl = Option<owl::Annotation<A>>;
+    fn into_owl(mut self, ctx: &mut Context<A>) -> Self::Owl {
         if !EXCLUDED.contains(self.key()) {
             // Take ownership of key and value without extra heap allocation.
             let key = std::mem::replace(
@@ -57,9 +58,9 @@ impl IntoOwlCtx for obo::Qualifier {
     }
 }
 
-impl IntoOwlCtx for obo::QualifierList {
-    type Owl = BTreeSet<owl::Annotation>;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::QualifierList {
+    type Owl = BTreeSet<owl::Annotation<A>>;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl {
         self.into_iter().flat_map(|q| q.into_owl(ctx)).collect()
     }
 }

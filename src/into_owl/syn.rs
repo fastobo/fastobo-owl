@@ -1,13 +1,14 @@
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::model::ForIRI;
 
 use super::Context;
 use super::IntoOwlCtx;
 use crate::constants::property;
 
-impl IntoOwlCtx for obo::Synonym {
-    type Owl = owl::AnnotatedAxiom;
-    fn into_owl(mut self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for obo::Synonym {
+    type Owl = owl::AnnotatedComponent<A>;
+    fn into_owl(mut self, ctx: &mut Context<A>) -> Self::Owl {
         // Build the main assertion
         let axiom = owl::AnnotationAssertion {
             subject: owl::AnnotationSubject::from(&ctx.current_frame),
@@ -28,13 +29,13 @@ impl IntoOwlCtx for obo::Synonym {
             });
         }
 
-        owl::AnnotatedAxiom::new(axiom, annotations)
+        owl::AnnotatedComponent::new(axiom, annotations)
     }
 }
 
-impl IntoOwlCtx for &obo::SynonymScope {
-    type Owl = owl::IRI;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl {
+impl<A: ForIRI> IntoOwlCtx<A> for &obo::SynonymScope {
+    type Owl = owl::IRI<A>;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl {
         ctx.build.iri(match self {
             obo::SynonymScope::Broad => property::obo_in_owl::HAS_BROAD_SYNONYM,
             obo::SynonymScope::Exact => property::obo_in_owl::HAS_EXACT_SYNONYM,

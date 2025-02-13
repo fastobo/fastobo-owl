@@ -6,6 +6,7 @@ extern crate pretty_assertions;
 use std::path::PathBuf;
 
 use fastobo_owl::IntoOwl;
+use horned_owl::model::Build;
 use horned_owl::ontology::set::SetOntology;
 use pretty_assertions::assert_eq;
 
@@ -27,23 +28,24 @@ macro_rules! converttest {
             // Parse the OBO doc and convert it to OWL.
             let obo_doc = fastobo::from_file(&input_path).expect("could not parse input file");
             let actual = obo_doc
-                .into_owl::<SetOntology>()
+                .into_owl::<SetOntology<String>>()
                 .expect("could not convert ontology to OWL");
 
-            // horned_owl::io::writer::write(&mut std::io::stdout(), &actual, Some(&PREFIXES));
-
             // Read the expected OWL
+            let mut reader = std::fs::File::open(&output_path)
+                .map(std::io::BufReader::new)
+                .expect("could not open output file");
             let (expected, _prefixes) =
-                horned_owl::io::owx::reader::read(&mut std::io::BufReader::new(
-                    std::fs::File::open(&output_path).expect("could not open output file"),
-                ))
-                .expect("could not parse output file");
+                horned_owl::io::owx::reader::read_with_build(&mut reader, &Build::new())
+                    .expect("could not parse output file");
 
             // reorder
             let mut exp: Vec<_> = expected.iter().collect();
             exp.sort();
             let mut act: Vec<_> = actual.iter().collect();
             act.sort();
+
+            // println!("act={:#?}", act);
 
             assert_eq!(act, exp);
         }

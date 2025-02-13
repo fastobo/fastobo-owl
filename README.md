@@ -41,10 +41,12 @@ from a file, convert it to OWL, and write it to another file in OWL/XML syntax:
 [`MutableOntology`]: https://docs.rs/horned-owl/latest/horned_owl/model/trait.MutableOntology.html
 
 ```rust
-extern crate fastobo;
-extern crate fastobo_owl;
-
+use std::rc::Rc;
+use horned_owl::model::AnnotatedComponent;
+use horned_owl::ontology::set::SetOntology;
+use horned_owl::ontology::component_mapped::ComponentMappedOntology;
 use fastobo_owl::IntoOwl;
+use fastobo_owl::IntoOwlPrefixes;
 
 // load an OBO ontology from a file
 let obo = fastobo::from_file("tests/data/ms.obo").expect("failed to read OBO file");
@@ -54,9 +56,8 @@ let obo = fastobo::from_file("tests/data/ms.obo").expect("failed to read OBO fil
 // (note: this contains OBO default prefixes such as xsd, rdf, or oboInOwl)
 let prefixes = obo.prefixes();
 
-// convert the ontology to OBO (the ontology type is implied by the later
-// call to owx::writer::write which expects an `AxiomMappedOntology`)
-let owl = obo.into_owl()
+// convert the ontology to OBO
+let owl: ComponentMappedOntology<Rc<str>, Rc<AnnotatedComponent<Rc<str>>>> = obo.into_owl()
   .expect("failed to convert OBO to OWL");
 
 // write the OWL ontology with abbreviated IRIs

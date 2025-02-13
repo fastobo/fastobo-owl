@@ -19,6 +19,7 @@ use std::ops::Deref;
 use fastobo::ast as obo;
 use fastobo::error::CardinalityError;
 use horned_owl::model as owl;
+use horned_owl::model::ForIRI;
 use horned_owl::model::MutableOntology;
 use horned_owl::model::Ontology;
 
@@ -32,13 +33,13 @@ use crate::error::Error;
 /// This is not exposed because `ctx` can be mostly inferred from the source
 /// OBO ontology, therefore a public trait shall be made available only for
 /// the `OboDoc` struct, with less arguments to provide.
-pub trait IntoOwlCtx {
+pub trait IntoOwlCtx<A: ForIRI> {
     type Owl;
-    fn into_owl(self, ctx: &mut Context) -> Self::Owl;
+    fn into_owl(self, ctx: &mut Context<A>) -> Self::Owl;
 }
 
-/// The public trait for context-free OBO to OWL conversion.
-pub trait IntoOwl {
+/// The public trait to guess
+pub trait IntoOwlPrefixes {
     /// Get the CURIE prefix mapping using IDSpaces declared in the document.
     ///
     /// This lets prefixed identifiers be shortened back again as CURIEs
@@ -47,10 +48,14 @@ pub trait IntoOwl {
     ///
     /// See also: [`horned_owl::io::writer::write`](https://docs.rs/horned-owl/latest/horned_owl/io/writer/fn.write.html).
     fn prefixes(&self) -> curie::PrefixMapping;
+}
+
+/// The public trait for context-free OBO to OWL conversion.
+pub trait IntoOwl<A: ForIRI> {
     /// Convert the OBO document into an `Ontology` in OWL language.
     fn into_owl<O>(self) -> Result<O, Error>
     where
-        O: Default + Ontology + MutableOntology;
+        O: Default + MutableOntology<A>;
 }
 
 // ---------------------------------------------------------------------------
@@ -70,9 +75,9 @@ lazy_static! {
 
 /// An opaque structure to pass context arguments required for OWL conversion.
 #[derive(Debug)]
-pub struct Context {
+pub struct Context<A: ForIRI> {
     /// The `horned_owl::model::Build` to create reference counted IRI.
-    pub build: owl::Build,
+    pub build: owl::Build<A>,
 
     /// A mapping of the declared OBO ID spaces to their respective URL bases.
     pub idspaces: HashMap<obo::IdentPrefix, obo::Url>,
@@ -81,7 +86,7 @@ pub struct Context {
     pub ontology_iri: obo::Url,
 
     /// The IRI of the frame currently being processed.
-    pub current_frame: owl::IRI,
+    pub current_frame: owl::IRI<A>,
 
     /// A flag to indicate the current frame is an annotation property.
     pub in_annotation: bool,
@@ -92,16 +97,16 @@ pub struct Context {
     /// A set of IRI which refer to class level relationships.
     ///
     /// This is likely to require processing imports beforehand.
-    pub class_level: HashSet<owl::IRI>,
+    pub class_level: HashSet<owl::IRI<A>>,
 
     /// A set or IRI which refer to metadata tag typedef.
     ///
     /// Properties that are marked as metadata tags are used to record object
     /// metadata and are translated to annotation properties.
-    pub metadata_tag: HashSet<owl::IRI>,
+    pub metadata_tag: HashSet<owl::IRI<A>>,
 }
 
-impl Context {
+impl<A: ForIRI> Context<A> {
     pub fn from_obodoc(doc: &obo::OboDoc) -> Result<Self, Error> {
         // Add the ID spaces declared implicitly in the document.
         let mut idspaces = HashMap::new();
@@ -140,14 +145,14 @@ impl Context {
         for frame in doc.entities().iter().flat_map(obo::EntityFrame::as_typedef) {
             let id = frame.id().as_ref().as_ref();
             if let obo::Ident::Unprefixed(unprefixed) = id {
-                if let Some(short) = Context::find_shorthand(frame) {
+                if let Some(short) = Context::<A>::find_shorthand(frame) {
                     shorthands.insert(unprefixed.deref().clone(), short.clone());
                 }
             }
         }
 
         // Create the conversion context.
-        let build: horned_owl::model::Build = Default::default();
+        let build = horned_owl::model::Build::<A>::new();
         let ontology_iri = obo::Url::new(format!("{}{}", uri::OBO, ontology?))?;
         let current_frame = build.iri(ontology_iri.as_str().to_string());
         let mut ctx = Context {
@@ -208,11 +213,11 @@ impl Context {
         }
     }
 
-    pub fn is_class_level(&mut self, rid: &owl::IRI) -> bool {
+    pub fn is_class_level(&mut self, rid: &owl::IRI<A>) -> bool {
         self.class_level.contains(rid)
     }
 
-    pub fn is_metadata_tag(&mut self, rid: &owl::IRI) -> bool {
+    pub fn is_metadata_tag(&mut self, rid: &owl::IRI<A>) -> bool {
         self.metadata_tag.contains(rid)
     }
 
@@ -221,9 +226,9 @@ impl Context {
         qualifiers: &obo::QualifierList,
         relation: obo::RelationIdent,
         cls: obo::ClassIdent,
-    ) -> owl::ClassExpression {
-        let r_iri: owl::IRI = relation.into_owl(self);
-        let c_iri: owl::IRI = cls.into_owl(self);
+    ) -> owl::ClassExpression<A> {
+        let r_iri: owl::IRI<A> = relation.into_owl(self);
+        let c_iri: owl::IRI<A> = cls.into_owl(self);
 
         if let Some(q) = qualifiers.iter().find(|q| q.key() == &*CARDINALITY) {
             let n: u32 = q.value().parse().expect("invalid value for `cardinality`");
@@ -344,7 +349,7 @@ impl Context {
     }
 }
 
-impl TryFrom<&obo::OboDoc> for Context {
+impl<A: ForIRI> TryFrom<&obo::OboDoc> for Context<A> {
     type Error = Error;
     fn try_from(doc: &obo::OboDoc) -> Result<Self, Error> {
         Self::from_obodoc(doc)
@@ -359,7 +364,7 @@ mod tests {
     #[test]
     fn missing_ontology_clause() {
         let doc = obo::OboDoc::new();
-        let res = Context::from_obodoc(&doc);
+        let res = Context::<String>::from_obodoc(&doc);
         assert!(matches!(
             res,
             Err(Error::Cardinality(CardinalityError::MissingClause { .. }))
@@ -376,7 +381,7 @@ mod tests {
             obo::UnquotedString::new("test2"),
         )));
 
-        let res = Context::from_obodoc(&doc);
+        let res = Context::<String>::from_obodoc(&doc);
         assert!(matches!(
             res,
             Err(Error::Cardinality(

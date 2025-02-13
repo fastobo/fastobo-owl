@@ -28,10 +28,7 @@ version = "0.15.3"
 default-features = false
 features = ["threading"]
 [dependencies.horned-owl]
-version = "0.11.0"
-default-features = false
-[dependencies.horned-functional]
-version = "0.4.0"
+version = "1.0.0"
 default-features = false
 
 [dev-dependencies]

@@ -17,6 +17,7 @@ mod into_owl;
 pub use error::Error;
 pub use error::Result;
 pub use into_owl::IntoOwl;
+pub use into_owl::IntoOwlPrefixes;
 
 // ---------------------------------------------------------------------------
 
