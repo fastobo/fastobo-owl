@@ -1,17 +1,14 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
-use horned_owl::model::AnnotatedComponent;
 use horned_owl::model::Component;
 use horned_owl::model::ForIRI;
 use horned_owl::model::Import;
 use horned_owl::model::MutableOntology;
-use horned_owl::model::OntologyID;
 
 use super::Context;
 use super::IntoOwl;
 use super::IntoOwlCtx;
 use super::IntoOwlPrefixes;
-use crate::constants::uri;
 use crate::error::Error;
 
 impl IntoOwlPrefixes for obo::OboDoc {
@@ -42,24 +39,6 @@ impl<A: ForIRI> IntoOwl<A> for obo::OboDoc {
 
         // Create the output ontology
         let mut ont = O::default();
-
-        // declare the IRI and Version IRI for the ontology.
-        let id = if let Ok(name) = self.header().ontology() {
-            OntologyID {
-                iri: Some(ctx.build.iri(format!("{}{}.owl", uri::OBO, name))),
-                viri: self
-                    .header()
-                    .data_version()
-                    .map(|dv| {
-                        ctx.build
-                            .iri(format!("{}{}/{}/{}.owl", uri::OBO, name, dv, name))
-                    })
-                    .ok(),
-            }
-        } else {
-            OntologyID::default()
-        };
-        ont.insert(AnnotatedComponent::from(Component::OntologyID(id)));
 
         // Convert the header frame: most frames end up as Ontology annotations,
         // but some of them require extra axioms.

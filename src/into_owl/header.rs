@@ -1,10 +1,14 @@
 use fastobo::ast as obo;
 use horned_owl::model as owl;
+use horned_owl::model::AnnotatedComponent;
 use horned_owl::model::ForIRI;
+use horned_owl::model::HigherKinded;
+use horned_owl::model::OntologyID;
 
 use super::Context;
 use super::IntoOwlCtx;
 use crate::constants::property;
+use crate::constants::uri;
 
 impl<A: ForIRI> IntoOwlCtx<A> for obo::HeaderClause {
     type Owl = Vec<owl::AnnotatedComponent<A>>;
@@ -202,6 +206,21 @@ impl<A: ForIRI> IntoOwlCtx<A> for obo::HeaderFrame {
         let mut owl_axioms: Vec<String> = Vec::new();
         let mut axioms: Vec<owl::AnnotatedComponent<A>> = Vec::with_capacity(self.len());
 
+        // declare the IRI and Version IRI for the ontology.
+        if let Ok(name) = self.ontology() {
+            let oid = OntologyID {
+                iri: Some(ctx.build.iri(format!("{}{}.owl", uri::OBO, name))),
+                viri: self
+                    .data_version()
+                    .map(|dv| {
+                        ctx.build
+                            .iri(format!("{}{}/{}/{}.owl", uri::OBO, name, dv, name))
+                    })
+                    .ok(),
+            };
+            axioms.push(AnnotatedComponent::from(oid));
+        }
+
         // Process the header frame clauses
         for clause in self.into_iter() {
             if let obo::HeaderClause::OwlAxioms(s) = clause {
@@ -218,7 +237,7 @@ impl<A: ForIRI> IntoOwlCtx<A> for obo::HeaderFrame {
             let reader = std::io::BufReader::new(std::io::Cursor::new(&text));
             let (ont, _) = horned_owl::io::ofn::reader::read_with_build(reader, &ctx.build)
                 .expect("invalid functional ontology");
-            axioms.extend(ont);
+            axioms.extend(ont.into_iter().filter(|c| !c.is_meta()));
         }
 
         axioms
