@@ -2,7 +2,7 @@
 
 *OWL language mapping for ontologies in the OBO flat file format 1.4*
 
-[![Actions](https://img.shields.io/github/workflow/status/fastobo/fastobo-owl/Test?style=flat-square&maxAge=600)](https://github.com/fastobo/fastobo-owl/actions)
+[![Actions](https://img.shields.io/github/actions/workflow/status/fastobo/fastobo-owl/test.yml?style=flat-square&maxAge=600)](https://github.com/fastobo/fastobo-owl/actions)
 [![Codecov](https://img.shields.io/codecov/c/gh/fastobo/fastobo-owl/master.svg?style=flat-square&maxAge=600)](https://codecov.io/gh/fastobo/fastobo-owl)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square&maxAge=2678400)](https://choosealicense.com/licenses/mit/)
 [![Source](https://img.shields.io/badge/source-GitHub-303030.svg?maxAge=2678400&style=flat-square)](https://github.com/fastobo/fastobo-owl/)
