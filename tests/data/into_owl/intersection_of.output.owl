@@ -4,7 +4,6 @@
   <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
   <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
   <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
-  <Import>http://www.geneontology.org/formats/oboInOwl</Import>
   <Annotation>
     <AnnotationProperty IRI="oboInOwl:hasDefaultNamespace"/>
     <Literal datatypeIRI="xsd:string">test</Literal>

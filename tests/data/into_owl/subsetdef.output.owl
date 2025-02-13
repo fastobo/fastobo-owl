@@ -8,7 +8,6 @@
     <Prefix name="dc" IRI="http://purl.org/dc/elements/1.1/"/>
     <Prefix name="oboInOwl" IRI="http://www.geneontology.org/formats/oboInOwl#"/>
     <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
-    <Import>http://www.geneontology.org/formats/oboInOwl</Import>
 
     <!-- Declaration -->
     <Declaration>

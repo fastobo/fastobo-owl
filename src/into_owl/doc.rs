@@ -1,8 +1,6 @@
 use fastobo::ast as obo;
 use fastobo::semantics::Identified;
-use horned_owl::model::Component;
 use horned_owl::model::ForIRI;
-use horned_owl::model::Import;
 use horned_owl::model::MutableOntology;
 
 use super::Context;
@@ -47,11 +45,9 @@ impl<A: ForIRI> IntoOwl<A> for obo::OboDoc {
             ont.insert(axiom);
         }
 
-        // force import of the oboInOwl ontology
-        ont.insert(Component::Import(Import(
-            ctx.build
-                .iri("http://www.geneontology.org/formats/oboInOwl"),
-        )));
+        // NOTE: force import of the oboInOwl ontology?
+        // let iri = "http://www.geneontology.org/formats/oboInOwl";
+        // ont.insert(Component::Import(Import(ctx.build.iri(iri))));
 
         // Convert each entity to a set of OWL axioms that are then added to the ontology.
         let entities = std::mem::replace(self.entities_mut(), Default::default());
