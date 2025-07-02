@@ -1,9 +1,11 @@
 use fastobo::ast as obo;
+use horned_owl::curie::PrefixMapping;
 use horned_owl::model as owl;
 use horned_owl::model::AnnotatedComponent;
 use horned_owl::model::ForIRI;
 use horned_owl::model::HigherKinded;
 use horned_owl::model::OntologyID;
+use horned_owl::ontology::set::SetOntology;
 
 use super::Context;
 use super::IntoOwlCtx;
@@ -237,8 +239,9 @@ impl<A: ForIRI> IntoOwlCtx<A> for obo::HeaderFrame {
         if !owl_axioms.is_empty() {
             let text = owl_axioms.join("\n");
             let reader = std::io::BufReader::new(std::io::Cursor::new(&text));
-            let (ont, _) = horned_owl::io::ofn::reader::read_with_build(reader, &ctx.build)
-                .expect("invalid functional ontology");
+            let (ont, _): (SetOntology<A>, PrefixMapping) =
+                horned_owl::io::ofn::reader::read_with_build(reader, &ctx.build)
+                    .expect("invalid functional ontology");
             axioms.extend(ont.into_iter().filter(|c| !c.is_meta()));
         }
 

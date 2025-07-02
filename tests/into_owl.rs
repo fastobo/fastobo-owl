@@ -35,7 +35,7 @@ macro_rules! converttest {
             let mut reader = std::fs::File::open(&output_path)
                 .map(std::io::BufReader::new)
                 .expect("could not open output file");
-            let (expected, _prefixes) =
+            let (expected, _prefixes): (SetOntology<String>, _) =
                 horned_owl::io::owx::reader::read_with_build(&mut reader, &Build::new())
                     .expect("could not parse output file");
 
