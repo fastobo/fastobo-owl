@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/fastobo/fastobo-owl/compare/v0.3.3...HEAD
+
+
+## [v0.3.3] - 2025-07-02
+
+[v0.3.3]: https://github.com/fastobo/fastobo-owl/compare/v0.3.2...v0.3.3
+
+### Fixed
+- Issues with `horned-owl` reader functions causing issues due to generic code.
 
 
 ## [v0.3.2] - 2025-02-13
